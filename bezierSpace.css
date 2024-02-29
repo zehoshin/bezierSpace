@@ -1,5 +1,6 @@
 @media screen and (max-width: 600px) {
     .btnIcon {
+        border-radius: 25px;
         position: absolute;
         cursor: pointer;
         width: 50px;
@@ -12,6 +13,7 @@
         top: 80px;
     }
     .textDiv {
+        font-weight: 900;
         font-size: 36pt;
         line-height: 1.2;
         margin-bottom: 10px;
@@ -49,6 +51,7 @@
         top: 90px;
     }
     .textDiv {
+        font-weight: 700;
         font-size: 100pt;
         line-height: 1.2;
         margin-bottom: 30px;
@@ -118,7 +121,6 @@
     transform: translateX(-50%);
     height: 100%;
     font-family: "Noto Sans KR", sans-serif;
-    font-weight: 700;
     display: flex;
     justify-content: center;
 }
@@ -151,3 +153,18 @@
     position: absolute;
   }
 
+@keyframes scaleAnimation {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.06);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.bouncing {
+    animation: scaleAnimation 1.2s cubic-bezier(.15,.8,.6,1) forwards;
+}

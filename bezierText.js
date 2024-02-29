@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function setSpeed() {
-        let seconds = 2.4;
+        let seconds = 2;
         const framesPerSecond = 60;
         const framesForDesiredMove = framesPerSecond * seconds;
         const newSpeed = 1 / framesForDesiredMove;
@@ -541,8 +541,13 @@ document.addEventListener('DOMContentLoaded', function() {
             curve.currentPoint += curve.speed * curve.direction;
             if (curve.points.length >= 4 && Math.abs(curve.currentPoint - 0.97) < 0.01) {
                 if (!curve.animationTriggered) {
-                    animateScale();
-                    curve.animationTriggered = true
+                    document.querySelectorAll('.textDiv').forEach(div => {
+                        div.classList.add('bouncing');
+                        setTimeout(() => {
+                            div.classList.remove('bouncing');
+                        }, 1500); // CSS 애니메이션 지속 시간에 맞춰 클래스 삭제
+                    });
+                    curve.animationTriggered = true;
                 }
             } else {
                 curve.animationTriggered = false;
@@ -557,45 +562,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
     }
 
-    function animateScale() {
-        const textDivs = document.querySelectorAll('.textDiv');
-        let startTime = null;
-    
-        function easeInOut(t) {
-            return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-        }
-    
-        function scaleAnimation(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const elapsed = timestamp - startTime;
-            const duration = 1000;
-            const scaleFactor = 0.04;
-            const progressFactor = 0.2;
-    
-            let progress = Math.min(elapsed / duration, 1)
-
-            let scale;
-            if (progress < progressFactor) {
-                let easeProgress = easeInOut(progress / progressFactor);
-                scale = 1 + (scaleFactor * easeProgress);
-            } else if (progress <= 1) {
-                let easeProgress = easeInOut((progress - progressFactor) / (1 - progressFactor));
-                scale = 1 + scaleFactor - (scaleFactor * easeProgress);
-            } else {
-                scale = 1;
-                return;
-            }
-            textDivs.forEach(div => {
-                div.style.transform = `scale(${scale})`;
-            });
-    
-            if (progress < 1) {
-                requestAnimationFrame(scaleAnimation); 
-            }
-        }
-        requestAnimationFrame(scaleAnimation);
-    }
-    
     animate();
 
        
