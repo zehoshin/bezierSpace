@@ -9,14 +9,14 @@
 
 </head>
 <body>
-    <img src="sources/toNight-Icon.svg" id="toggleMode" style="cursor: pointer;">
-
+    <img src="sources/toNight-Icon.svg" id="toggleMode" class="btnIcon" style="cursor: pointer;">
+    <img src="sources/ranDay-Icon.svg" id="ranDice" class="btnIcon" style="cursor: pointer;">
     <div id="exScroll"></div>
     <div id="boundBox" class="non-clickable">
         <div id="container"></div>
     </div>
 
-    <input type="text" id="textInput" oninput="this.value = this.value.toUpperCase()">
+    <input type="text" id="textInput" placeholder="TEXT~TYPE~WITH [⁓]!" oninput="this.value = this.value.toUpperCase()">
 
     <canvas id="bezierCanvas" width="1920" height="1080"></canvas>
 
@@ -25,22 +25,25 @@
         document.getElementById('toggleMode').addEventListener('click', function() {
             const body = document.body;
             const exScroll = document.getElementById('exScroll');
-            const image = document.getElementById('toggleMode');
+            const dayNight = document.getElementById('toggleMode');
+            const ranDice = document.getElementById('ranDice');
 
             body.classList.toggle('night-mode');
             if (!body.classList.contains('night-mode')) {
                 body.classList.add('day-mode');
                 exScroll.style.mixBlendMode = 'multiply';
+                ranDice.src = 'sources/ranDay-Icon.svg';
 
             } else {
                 body.classList.remove('day-mode');
                 exScroll.style.mixBlendMode = 'screen';
+                ranDice.src = 'sources/ranNight-Icon.svg';
             }
 
-            if (image.src.includes('sources/toNight-Icon.svg')) {
-                image.src = 'sources/toDay-Icon.svg';
+            if (dayNight.src.includes('sources/toNight-Icon.svg')) {
+                dayNight.src = 'sources/toDay-Icon.svg';
             } else {
-                image.src = 'sources/toNight-Icon.svg';
+                dayNight.src = 'sources/toNight-Icon.svg';
             }
         });
         </script>

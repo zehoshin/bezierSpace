@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
     //텍스트 div 생성 --------------------------------------------------------
     let textInput = document.getElementById('textInput');
     let container = document.getElementById('container');
+    let canvas = document.getElementById('bezierCanvas');
+    let ranDice = document.getElementById('ranDice');
+
+    let ctx = canvas.getContext('2d');
+    let allControlPoints = [];
+    const endXFactor = -20;
     const textAlignMap = {};
 
     function textJustify() {
@@ -15,10 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    textInput.addEventListener('keyup', function() {
+    function onTextInput() {
         let textValue = textInput.value;
         let textArray = textValue.split('~');
-
         let currentCircleNums = new Set();
 
 
@@ -64,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         textJustify();
         genBezierCurve(); 
-    });
+    };
 
     function createCircle(parentDiv, circleNum) {
         let circleDiv = document.createElement('div');
@@ -80,6 +85,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return textAlignMap[key];
     }
+    
+    // 초기화: 기본 문장 설정
+    textInput.value = "TEXT~TYPE~WITH [⁓]!";
+    onTextInput(); // 초기 div 생성 및 화면 표시
+
+    textInput.addEventListener('keyup', onTextInput);
+    ranDice.addEventListener('click', onTextInput);
+
+    function ranTextAlign() {
+        document.querySelectorAll('.textDiv').forEach((div, index) => {
+            const textAlignValue = ['left', 'center', 'right'][Math.floor(Math.random() * 3)];
+            div.style.textAlign = textAlignValue;
+
+            const circleNum = index * 2 + 2; // 뒤에 오는 circle 기준
+            textAlignMap[`textCircleNum${circleNum}`] = textAlignValue;
+        });
+        genBezierCurve();
+    }
+    
+    ranDice.addEventListener('click', ranTextAlign);
 
     //스크롤바-------------------------------------------------------------
     const exScroll = document.getElementById('exScroll');
@@ -185,10 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Bezier Curve 생성-----------------------------------------------------
 
-    let canvas = document.getElementById('bezierCanvas');
-    let ctx = canvas.getContext('2d');
-    let allControlPoints = [];
-
     // 랜덤
     function ranColor() {
         let code = '#';
@@ -254,7 +275,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const dx = x - refPoint.x;
         const dy = y - refPoint.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
-        console.log(distance);
         if (distance > MAX_DISTANCE) {
             const angle = Math.atan2(dy, dx);
             x = refPoint.x + Math.cos(angle) * MAX_DISTANCE * (Math.random() - 0.5) * 2;
@@ -268,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function setSpeed() {
-        let seconds = 3;
+        let seconds = 2.4;
         const framesPerSecond = 60;
         const framesForDesiredMove = framesPerSecond * seconds;
         const newSpeed = 1 / framesForDesiredMove;
@@ -346,9 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.stroke();
         ctx.setLineDash([]);
     }
-
-    const endXFactor = -20;
-    
+   
     function getStartEndPos(circleNum) {
         const circle = document.querySelector(`.textCircleNum${circleNum}`);
         if (!circle) return null;
@@ -424,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         if (newControlPointsAdded) {
             redraw(); // 모든 곡선 다시 그리기
-            console.log(allControlPoints);
+            // console.log(allControlPoints);
         }
     }
 
