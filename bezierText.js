@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
             // 위치 및 방향 업데이트
             curve.currentPoint += curve.speed * curve.direction;
-            if (curve.points.length >= 4 && Math.abs(curve.currentPoint - 0.97) < 0.01) {
+            if (curve.points.length >= 4 && Math.abs(curve.currentPoint - 0.99) < 0.01) {
                 if (!curve.animationTriggered) {
                     document.querySelectorAll('.textDiv').forEach(div => {
                         div.classList.add('bouncing');
