@@ -563,8 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     animate();
-
-       
+      
     //마우스 드래그 이벤트---------------------------------------------
     let dragging = false;
     let draggingPoint = null; // 드래그 중인 제어점 정보

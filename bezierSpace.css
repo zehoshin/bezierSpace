@@ -35,11 +35,6 @@
     #textInput {
         bottom: 50px;
     }
-    input,
-    textarea,
-    select {
-        font-size: 16px;
-    }
 }
 @media screen and (min-width: 600px) {
     .btnIcon {
@@ -76,7 +71,7 @@
         right: 30px;
     }
     #textInput {
-        bottom: 100px;
+        bottom: 80px;
     }
 }
 
@@ -87,6 +82,12 @@
     padding: 0;
     box-sizing: border-box;
     overflow: hidden;
+}
+
+input,
+textarea,
+select {
+    font-size: 16px;
 }
 
 .day-mode {
@@ -173,3 +174,4 @@
 .bouncing {
     animation: scaleAnimation 1.2s cubic-bezier(.15,.8,.6,1) forwards;
 }
+
