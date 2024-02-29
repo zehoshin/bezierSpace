@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezier Space</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">    
+    <link rel="stylesheet" href="bezierSpace.css">
+
+</head>
+<body>
+    <img src="sources/toNight-Icon.svg" id="toggleMode" style="cursor: pointer;">
+
+    <div id="exScroll"></div>
+    <div id="boundBox" class="non-clickable">
+        <div id="container"></div>
+    </div>
+
+    <input type="text" id="textInput" oninput="this.value = this.value.toUpperCase()">
+
+    <canvas id="bezierCanvas" width="1920" height="1080"></canvas>
+
+    <script src="jquery-3.7.1.min.js"></script>
+    <script>
+        document.getElementById('toggleMode').addEventListener('click', function() {
+            const body = document.body;
+            const exScroll = document.getElementById('exScroll');
+            const image = document.getElementById('toggleMode');
+
+            body.classList.toggle('night-mode');
+            if (!body.classList.contains('night-mode')) {
+                body.classList.add('day-mode');
+                exScroll.style.mixBlendMode = 'multiply';
+
+            } else {
+                body.classList.remove('day-mode');
+                exScroll.style.mixBlendMode = 'screen';
+            }
+
+            if (image.src.includes('sources/toNight-Icon.svg')) {
+                image.src = 'sources/toDay-Icon.svg';
+            } else {
+                image.src = 'sources/toNight-Icon.svg';
+            }
+        });
+        </script>
+    <script type="module" src="bezier.js"></script>
+    <script type="module" src="bezierText.js"></script>
+    
+</body>
+</html>
