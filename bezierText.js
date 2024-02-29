@@ -550,8 +550,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const scaleFactor = 0.04;
             const progressFactor = 0.2;
     
-            let progress = elapsed / duration;
-    
+            let progress = Math.min(elapsed / duration, 1)
+
             let scale;
             if (progress < progressFactor) {
                 let easeProgress = easeInOut(progress / progressFactor);
@@ -567,7 +567,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 div.style.transform = `scale(${scale})`;
             });
     
-            requestAnimationFrame(scaleAnimation);
+            if (progress < 1) {
+                requestAnimationFrame(scaleAnimation); 
+            }
         }
         requestAnimationFrame(scaleAnimation);
     }
