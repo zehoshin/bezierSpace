@@ -189,6 +189,22 @@ document.addEventListener('DOMContentLoaded', function() {
     let ctx = canvas.getContext('2d');
     let allControlPoints = [];
     
+    //모바일 해상도
+    function adjustCanvasResolution(canvas) {
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.getBoundingClientRect();
+    
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+    
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+    
+        var ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+    }
+    adjustCanvasResolution(canvas);
+
     // 랜덤
     function ranColor() {
         let code = '#';
