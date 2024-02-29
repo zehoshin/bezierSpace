@@ -188,22 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let canvas = document.getElementById('bezierCanvas');
     let ctx = canvas.getContext('2d');
     let allControlPoints = [];
-    
-    //모바일 해상도
-    function adjustCanvasResolution(canvas) {
-        var dpr = window.devicePixelRatio || 1;
-        var rect = canvas.getBoundingClientRect();
-    
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-    
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
-    
-        var ctx = canvas.getContext('2d');
-        ctx.scale(dpr, dpr);
-    }
-    adjustCanvasResolution(canvas);
 
     // 랜덤
     function ranColor() {
@@ -306,12 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     ctx.beginPath();
                     ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);
                     ctx.fill();
+                    ctx.antialias = true
                     break;
                 case 'square':
                     ctx.beginPath();
                     size *= 0.9;
                     ctx.rect(point.x - size, point.y - size, size * 2, size * 2);
                     ctx.fill();
+                    ctx.antialias = true
                     break;
             }
         });
@@ -327,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         ctx.strokeStyle = curve.color;
         ctx.lineWidth = curve.lineWidth;
+        ctx.antialias = true
 
         if (curve.lineStyle === 'dashed') {
             ctx.setLineDash([curve.lineWidth, curve.lineWidth]);
@@ -349,7 +336,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         ctx.strokeStyle = curve.color;
         ctx.lineWidth = curve.lineWidth;
-
+        ctx.antialias = true
+        
         if (curve.lineStyle === 'dashed') {
             ctx.setLineDash([curve.lineWidth, curve.lineWidth]);
         } else {
