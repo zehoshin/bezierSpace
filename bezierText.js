@@ -133,16 +133,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 드래그 이벤트 추가 (마우스 및 터치 지원)
-    exScroll.addEventListener('mousedown', startDrag);
-    exScroll.addEventListener('touchstart', startDrag);
+    exScroll.addEventListener('mousedown', startScroll);
+    exScroll.addEventListener('touchstart', startScroll);
 
-    function startDrag(e) {
+    function startScroll(e) {
         isDragging = true;
         const startY = e.pageY || e.touches[0].pageY; // 마우스 또는 터치 시작 Y 위치
         const startTop = parseFloat(exScroll.style.top) || 0;
         const maxTop = container.clientHeight - exScroll.offsetHeight;
 
-        function onDrag(e) {
+        function onScroll(e) {
             if (!isDragging) return;
             let deltaY = (e.pageY || e.touches[0].pageY) - startY; // 마우스 또는 터치 이동 거리
             let newTop = Math.min(maxTop, Math.max(0, startTop + deltaY));
@@ -151,18 +151,18 @@ document.addEventListener('DOMContentLoaded', function() {
             container.scrollTop = scrollPer * (container.scrollHeight - container.clientHeight);
         }
 
-        function stopDrag() {
+        function stopScroll() {
             isDragging = false;
-            document.removeEventListener('mousemove', onDrag);
-            document.removeEventListener('mouseup', stopDrag);
-            document.removeEventListener('touchmove', onDrag);
-            document.removeEventListener('touchend', stopDrag);
+            document.removeEventListener('mousemove', onScroll);
+            document.removeEventListener('mouseup', stopScroll);
+            document.removeEventListener('touchmove', onScroll);
+            document.removeEventListener('touchend', stopScroll);
         }
 
-        document.addEventListener('mousemove', onDrag);
-        document.addEventListener('mouseup', stopDrag);
-        document.addEventListener('touchmove', onDrag);
-        document.addEventListener('touchend', stopDrag);
+        document.addEventListener('mousemove', onScroll);
+        document.addEventListener('mouseup', stopScroll);
+        document.addEventListener('touchmove', onScroll);
+        document.addEventListener('touchend', stopScroll);
 
         e.preventDefault();
     }
