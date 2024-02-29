@@ -35,7 +35,7 @@
     #textInput {
         bottom: 50px;
     }
-    #input,
+    input,
     textarea,
     select {
         font-size: 16px;
