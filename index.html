@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bezier Space</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">    
-    <link rel="stylesheet" href="bezierSpace.css">
+    <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
+    <div id="threeCanvas" class="non-clickable"></div>
     <div id="boundBox" class="non-clickable">
         <div id="container"></div>
     </div>
@@ -21,34 +22,9 @@
 
 
     <script src="jquery-3.7.1.min.js"></script>
-    <script>
-        document.getElementById('toggleMode').addEventListener('click', function() {
-            const body = document.body;
-            const exScroll = document.getElementById('exScroll');
-            const dayNight = document.getElementById('toggleMode');
-            const ranDice = document.getElementById('ranDice');
-
-            body.classList.toggle('night-mode');
-            if (!body.classList.contains('night-mode')) {
-                body.classList.add('day-mode');
-                exScroll.style.mixBlendMode = 'multiply';
-                ranDice.src = 'sources/ranDay-Icon.svg';
-
-            } else {
-                body.classList.remove('day-mode');
-                exScroll.style.mixBlendMode = 'screen';
-                ranDice.src = 'sources/ranNight-Icon.svg';
-            }
-
-            if (dayNight.src.includes('sources/toNight-Icon.svg')) {
-                dayNight.src = 'sources/toDay-Icon.svg';
-            } else {
-                dayNight.src = 'sources/toNight-Icon.svg';
-            }
-        });
-
-        </script>
     <script type="module" src="bezier.js"></script>
     <script type="module" src="bezierText.js"></script>
+    <script type="module" src="script.js"></script>
+
 </body>
 </html>
