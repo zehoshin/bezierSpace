@@ -22,12 +22,12 @@ threeCanvas.appendChild( renderer.domElement );
 
 const textureLoader = new THREE.CubeTextureLoader();
 const environmentMapTexture = textureLoader.load([
-    '/sources/cubeMap/px.png',
-    '/sources/cubeMap/nx.png',
-    '/sources/cubeMap/py.png',
-    '/sources/cubeMap/ny.png',
-    '/sources/cubeMap/pz.png',
-    '/sources/cubeMap/nz.png'
+    './sources/cubeMap/px.png',
+    './sources/cubeMap/nx.png',
+    './sources/cubeMap/py.png',
+    './sources/cubeMap/ny.png',
+    './sources/cubeMap/pz.png',
+    './sources/cubeMap/nz.png'
 ])
 
 let scaleFactor = window.innerWidth <= 600 ? 0.2 : 0.4;
@@ -220,7 +220,6 @@ function animateMeshes() {
                 mesh.scale.set(scale, scale, scale);
             }
         }
-
         mesh.rotation.x += 0.01;
         mesh.rotation.y += 0.01;
         mesh.rotation.z += 0.01;
@@ -228,7 +227,6 @@ function animateMeshes() {
         const quaternion = new THREE.Quaternion();
         quaternion.setFromEuler(new THREE.Euler(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z));
         mesh.body.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-        
     });
 }
 
