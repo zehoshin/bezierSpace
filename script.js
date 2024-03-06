@@ -20,6 +20,79 @@ const threeCanvas = document.getElementById('threeCanvas');
 
 threeCanvas.appendChild( renderer.domElement );
 
+// cannon-es.js 물리 세계 생성
+const world = new CANNON.World();
+world.gravity.set(0,0,0);
+world.broadphase = new CANNON.SAPBroadphase(world);
+world.solver = new CANNON.GSSolver();
+
+world.solver.iterations = 10;
+world.solver.tolerance = 0.001;
+
+//중력 이벤트----------------------------------------------------------
+let gravityResetTimer;
+
+window.addEventListener('wheel', function(event) {
+    clearTimeout(gravityResetTimer);
+    if (event.deltaY < 0) {
+        world.gravity.set(0, -0.8, 0);
+    } else {
+        world.gravity.set(0, 0.8, 0);
+    }
+    gravityResetTimer = setTimeout(() => {
+        world.gravity.set(0, 0, 0);
+    }, 1000);
+});
+
+const exScroll = document.getElementById('exScroll');
+let isDragging = false;
+
+exScroll.addEventListener('mousedown', startScroll);
+exScroll.addEventListener('touchstart', startScroll);
+
+function startScroll(e) {
+    isDragging = true;
+    const startY = e.pageY || e.touches[0].pageY;
+    const startTop = parseFloat(exScroll.style.top) || 0;
+    const maxTop = container.clientHeight - exScroll.offsetHeight;
+
+    function onScroll(e) {
+        if (!isDragging) return;
+        let currentY = e.pageY || e.touches[0].pageY;
+        let deltaY = currentY - startY;
+
+        if (deltaY < 0) {
+            world.gravity.set(0, -1.6, 0);
+        } else if (deltaY > 0) {
+            world.gravity.set(0, 1.6, 0);
+        }
+
+        let newTop = Math.min(maxTop, Math.max(0, startTop + deltaY));
+        exScroll.style.top = `${newTop}px`;
+
+        const scrollPer = newTop / maxTop;
+        container.scrollTop = scrollPer * (container.scrollHeight - container.clientHeight);
+    }
+
+    function stopScroll() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onScroll);
+        document.removeEventListener('mouseup', stopScroll);
+        document.removeEventListener('touchmove', onScroll);
+        document.removeEventListener('touchend', stopScroll);
+
+        world.gravity.set(0, 0, 0);
+    }
+
+    document.addEventListener('mousemove', onScroll);
+    document.addEventListener('mouseup', stopScroll);
+    document.addEventListener('touchmove', onScroll);
+    document.addEventListener('touchend', stopScroll);
+
+    e.preventDefault();
+}
+
+//MESH----------------------------------------------------------
 const textureLoader = new THREE.CubeTextureLoader();
 const environmentMapTexture = textureLoader.load([
     './sources/cubeMap/px.png',
@@ -45,81 +118,6 @@ const materials = [
     (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = true; return m; })(), // Normal.flatShading
     (() => { const m = new THREE.MeshStandardMaterial({ color: 0xe0e0e0 }); m.roughness = 0.1; m.metalness = 1.0; m.envMap = environmentMapTexture; return m; })() // Metal
 ];
-
-// cannon-es.js 물리 세계 생성
-const world = new CANNON.World();
-world.gravity.set(0,0,0);
-world.broadphase = new CANNON.SAPBroadphase(world);
-world.solver = new CANNON.GSSolver();
-
-world.solver.iterations = 10;
-world.solver.tolerance = 0.001;
-
-let gravityResetTimer;
-
-window.addEventListener('wheel', function(event) {
-    clearTimeout(gravityResetTimer);
-    if (event.deltaY < 0) {
-        world.gravity.set(0, -0.8, 0);
-    } else {
-        world.gravity.set(0, 0.8, 0);
-    }
-    gravityResetTimer = setTimeout(() => {
-        world.gravity.set(0, 0, 0);
-    }, 1000);
-});
-
-const exScroll = document.getElementById('exScroll');
-let isDragging = false;
-
-exScroll.addEventListener('mousedown', startScroll);
-exScroll.addEventListener('touchstart', startScroll);
-
-function startScroll(e) {
-    isDragging = true;
-    const startY = e.pageY || e.touches[0].pageY; // 드래그 시작 위치 저장
-
-    const startTop = parseFloat(exScroll.style.top) || 0;
-    const maxTop = container.clientHeight - exScroll.offsetHeight;
-
-    function onScroll(e) {
-        if (!isDragging) return;
-
-        let currentY = e.pageY || e.touches[0].pageY; // 현재 드래그 위치
-        let deltaY = currentY - startY; // 드래그 방향 판단을 위한 차이 계산
-
-        // 중력 방향 결정 로직 추가
-        if (deltaY < 0) {
-            world.gravity.set(0, -1.6, 0); // 위로 드래그하는 경우, Y축 양의 방향으로 중력 적용
-        } else if (deltaY > 0) {
-            world.gravity.set(0, 1.6, 0); // 아래로 드래그하는 경우, Y축 음의 방향으로 중력 적용
-        }
-
-        let newTop = Math.min(maxTop, Math.max(0, startTop + deltaY));
-        exScroll.style.top = `${newTop}px`;
-
-        const scrollPer = newTop / maxTop;
-        container.scrollTop = scrollPer * (container.scrollHeight - container.clientHeight);
-    }
-
-    function stopScroll() {
-        isDragging = false;
-        document.removeEventListener('mousemove', onScroll);
-        document.removeEventListener('mouseup', stopScroll);
-        document.removeEventListener('touchmove', onScroll);
-        document.removeEventListener('touchend', stopScroll);
-
-        // 드래그 종료 후 중력 (0, 0, 0)으로 재설정
-        world.gravity.set(0, 0, 0);
-    }
-
-    document.addEventListener('mousemove', onScroll);
-    document.addEventListener('mouseup', stopScroll);
-    document.addEventListener('touchmove', onScroll);
-    document.addEventListener('touchend', stopScroll);
-
-    e.preventDefault(); // 기본 이벤트 방지
-}
 
 function getShapeForGeometry(geometry, scale) {
     if (geometry instanceof THREE.BoxGeometry) {
@@ -444,4 +442,9 @@ const opacityRange = document.getElementById('3d-opacity');
 opacityRange.addEventListener('input', function() {
     let opacityValue = opacityRange.value / 10;
     threeCanvas.style.opacity = opacityValue;
+    if (opacityValue == 0) {
+        threeCanvas.style.display = 'none';
+    } else {
+        threeCanvas.style.display = 'block';
+    }
 });
