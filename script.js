@@ -13,7 +13,7 @@ const radius = 0.1;
 const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 5 );
 scene.add( light );
 
-const renderer = new THREE.WebGLRenderer( { alpha: true } ); 
+const renderer = new THREE.WebGLRenderer( { alpha: true, preserveDrawingBuffer: true } ); 
 renderer.setClearColor( 0x000000, 0 );
 renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
@@ -395,26 +395,38 @@ const filter = document.getElementById('filter');
 const filterBox = document.getElementById('filterBox');
 
 document.getElementById('toggleMode').addEventListener('click', function() {
-    const body = document.body;
+    const bg = document.getElementById('bg');
+    const boundBox = document.getElementById('boundBox');
     const exScroll = document.getElementById('exScroll');
     const dayNight = document.getElementById('toggleMode');
     const ranDice = document.getElementById('ranDice');
+    const saveImg = document.getElementById('saveImg');
 
-    body.classList.toggle('day-mode');
-    if (!body.classList.contains('day-mode')) {
-        body.classList.add('night-mode');
+    bg.classList.toggle('day-mode');
+    if (!bg.classList.contains('day-mode')) {
+        bg.classList.add('night-mode');
+        boundBox.classList.remove('blackText');
+        boundBox.classList.add('whiteText');
+
         exScroll.style.mixBlendMode = 'screen';
         ranDice.src = 'sources/ranNight-Icon.svg';
         filter.src = 'sources/filterNight-Icon.svg';
         filterBox.style.border = 'solid white 2.5px';
+        filterBox.style.color = 'white';
+        saveImg.src = 'sources/saveImgNight-Icon.svg';
     } else {
-        body.classList.remove('night-mode');
+        bg.classList.remove('night-mode');
+        boundBox.classList.remove('whiteText');
+        boundBox.classList.add('blackText');
+
         exScroll.style.mixBlendMode = 'multiply';
         ranDice.src = 'sources/ranDay-Icon.svg';
         filter.src = 'sources/filterDay-Icon.svg';
         filterBox.style.border = 'solid black 2.6px';
+        filterBox.style.color = 'black';
+        saveImg.src = 'sources/saveImgDay-Icon.svg';
     }
-
+    
     if (dayNight.src.includes('sources/toDay-Icon.svg')) {
         dayNight.src = 'sources/toNight-Icon.svg';
     } else {
@@ -423,7 +435,6 @@ document.getElementById('toggleMode').addEventListener('click', function() {
 });
 
 filter.addEventListener('click', function() {
-    console.log(filterBox.style.display)
     if (filterBox.style.display == 'flex') {
         filterBox.style.display = 'none';
     } else {

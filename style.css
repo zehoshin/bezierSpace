@@ -19,6 +19,9 @@
         top: 135px;
         left: 80px;
     }
+    #saveImg {
+        top: 190px;
+    }
     .textDiv {
         font-weight: 900;
         font-size: 36pt;
@@ -64,6 +67,9 @@
         top: 155px;
         left: 95px;
     }
+    #saveImg {
+        top: 220px;
+    }
     .textDiv {
         font-weight: 700;
         font-size: 100pt;
@@ -106,18 +112,32 @@ select {
 
 .day-mode {
     background: linear-gradient(0deg, rgb(255, 255, 255, 1) 80%, rgba(220,220,220,1) 100%);
-    color: rgb(0, 0, 0);
-    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.4);
 }
 
 .night-mode {
     background: linear-gradient(0deg, rgba(55,55,55,1) 0%, rgba(0,0,0,1) 20%);
+}
+
+.whiteText {
     color: rgb(255, 255, 255);
     text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
 }
 
+.blackText {
+    color: rgb(0, 0, 0);
+    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.4);
+}
+
 body {
     font-family: "Noto Sans KR", sans-serif;
+}
+
+#bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -2;
 }
 
 .non-clickable {
@@ -206,9 +226,11 @@ body {
     animation: scaleAnimation 1s cubic-bezier(.15,.8,.6,1) forwards;
 }
 
-#threeCanvas{
+#threeCanvas {
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     z-index: -1;
 }
+

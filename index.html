@@ -8,17 +8,23 @@
     <link rel="stylesheet" href="style.css">
 
 </head>
-<body class="night-mode">
-    <div id="threeCanvas" class="non-clickable"></div>
-    <div id="boundBox" class="non-clickable">
-        <div id="container"></div>
-    </div>
-    <canvas id="bezierCanvas" width="1920" height="1080"></canvas>
+<body>
+    
+    <div id="bg" class="night-mode"></div>
+    <div id="captureArea" >
 
+        <div id="threeCanvas" class="non-clickable"></div>
+        <div id="boundBox" class="non-clickable whiteText">
+            <div id="container"></div>
+        </div>
+        <canvas id="bezierCanvas" width="1920" height="1080"></canvas>
+    </div>
     <img src="sources/toDay-Icon.svg" id="toggleMode" class="btnIcon">
     <img src="sources/ranNight-Icon.svg" id="ranDice" class="btnIcon">
     <img src="sources/filterNight-Icon.svg" id="filter" class="btnIcon">
-    <div id="filterBox">
+    <img src="sources/saveImgNight-Icon.svg" id="saveImg" class="btnIcon">
+
+    <div id="filterBox" style="color: white;">
         <label for="tempo" id="tempoText">TEMPO = 2.0s</label>
         <input type="range" id="tempo" name="tempo" min="1" max="5" step ="0.5" value="2"/>
         <label for="3d-opacity">3D OPACITY</label>
@@ -32,6 +38,8 @@
     <script type="module" src="bezier.js"></script>
     <script type="module" src="bezierText.js"></script>
     <script type="module" src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.0/html2canvas.min.js"></script>
+    <script src="saveImg.js"></script>
 
 </body>
 </html>
