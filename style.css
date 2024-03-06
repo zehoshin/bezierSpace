@@ -12,6 +12,13 @@
     #ranDice {
         top: 80px;
     }
+    #filter {
+        top: 135px;
+    }
+    #filterBox {
+        top: 135px;
+        left: 80px;
+    }
     .textDiv {
         font-weight: 900;
         font-size: 36pt;
@@ -49,6 +56,13 @@
     }
     #ranDice {
         top: 90px;
+    }
+    #filter {
+        top: 155px;
+    }
+    #filterBox {
+        top: 155px;
+        left: 95px;
     }
     .textDiv {
         font-weight: 700;
@@ -91,15 +105,19 @@ select {
 }
 
 .day-mode {
-    background-color: rgb(255, 255, 255);
+    background: linear-gradient(0deg, rgb(255, 255, 255, 1) 80%, rgba(220,220,220,1) 100%);
     color: rgb(0, 0, 0);
-    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.6);
+    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.4);
 }
 
 .night-mode {
-    background-color: rgb(0, 0, 0);
+    background: linear-gradient(0deg, rgba(55,55,55,1) 0%, rgba(0,0,0,1) 20%);
     color: rgb(255, 255, 255);
     text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
+}
+
+body {
+    font-family: "Noto Sans KR", sans-serif;
 }
 
 .non-clickable {
@@ -107,12 +125,26 @@ select {
 }
 
 #exScroll {
-    mix-blend-mode: multiply;
+    mix-blend-mode: screen;
     border-radius: 10px;
     background: #ccc;
     position: absolute;
     cursor: pointer;
     opacity: 0.5;
+}
+
+#filterBox {
+    position: absolute;
+    padding: 12px 15px 15px 15px;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    border: solid white 2.5px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+#tempo {
+    margin-bottom: 10px;
 }
 
 #textInput {
@@ -126,7 +158,6 @@ select {
     left: 50%;
     transform: translateX(-50%);
     height: 100%;
-    font-family: "Noto Sans KR", sans-serif;
     display: flex;
     justify-content: center;
 }
@@ -172,7 +203,7 @@ select {
 }
 
 .bouncing {
-    animation: scaleAnimation 1.2s cubic-bezier(.15,.8,.6,1) forwards;
+    animation: scaleAnimation 1s cubic-bezier(.15,.8,.6,1) forwards;
 }
 
 #threeCanvas{

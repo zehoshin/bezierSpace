@@ -11,6 +11,28 @@ let ctx = canvas.getContext('2d');
 let bezierCnt;
 let pointPos;
 let allControlPoints = [];
+let seconds = 2;
+
+const tempoRange = document.getElementById('tempo');
+tempoRange.addEventListener('input', function() {
+    let tempoValue = tempoRange.value;
+    if (tempoValue == 1) {
+        seconds = 1.01;
+    } else {
+    seconds = tempoValue;
+    }
+    const tempoText = document.getElementById('tempoText')
+    tempoText.innerHTML = 'TEMPO = ' + parseFloat(tempoValue).toFixed(1) + 's';
+    updateSpeedForAllCurves();
+});
+
+function updateSpeedForAllCurves() {
+    const newSpeed = setSpeed();
+    allControlPoints.forEach(curve => {
+        curve.speed = newSpeed;
+    });
+}
+
 
 const endXFactor = -20;
 const textAlignMap = {};
@@ -289,7 +311,6 @@ function ranPoint(circleNum, refPoint) {
 }
 
 function setSpeed() {
-    let seconds = 2;
     const framesPerSecond = 60;
     const framesForDesiredMove = framesPerSecond * seconds;
     const newSpeed = 1 / framesForDesiredMove;
@@ -547,7 +568,7 @@ function animate() {
                     div.classList.add('bouncing');
                     setTimeout(() => {
                         div.classList.remove('bouncing');
-                    }, 1500); // CSS 애니메이션 지속 시간에 맞춰 클래스 삭제
+                    }, 1000); // CSS 애니메이션 지속 시간에 맞춰 클래스 삭제
                 });
                 curve.animationTriggered = true;
             }

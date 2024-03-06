@@ -3,7 +3,7 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
 <style type="text/css">
-	.st0{stroke:#FFFFFF;stroke-width:4;stroke-miterlimit:10;}
+	.st0{fill:none;stroke:#FFFFFF;stroke-width:4;stroke-miterlimit:10;}
 	.st1{fill:#FFFFFF;}
 	.st2{fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
 	.st3{stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
@@ -11,8 +11,14 @@
 	.st5{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st6{stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st7{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
-	.st8{fill:#FFFFFF;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
+	.st8{fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
 	.st9{fill:none;stroke:#FFFF00;stroke-miterlimit:10;}
+	.st10{fill:url(#SVGID_1_);}
+	.st11{fill:url(#SVGID_00000114771004051035233520000001709518589076520071_);}
+	.st12{fill:url(#SVGID_00000100383119596040147970000013317001721276972175_);}
+	.st13{fill:url(#SVGID_00000134215645677147041690000010254941358724275853_);}
+	.st14{fill:url(#SVGID_00000046322020522421904510000000553232285525114770_);}
+	.st15{fill:url(#SVGID_00000042002284486231727080000001082468332709289151_);}
 </style>
 <circle class="st0" cx="50" cy="50" r="44.45"/>
 <g>

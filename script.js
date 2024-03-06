@@ -4,7 +4,6 @@ import * as CANNON from './cannon-es.js'
 import { bezierCnt, pointPos, ranColor } from './bezierText.js'
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x000000 );
 
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.z = 6;
@@ -14,7 +13,8 @@ const radius = 0.1;
 const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 5 );
 scene.add( light );
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer( { alpha: true } ); 
+renderer.setClearColor( 0x000000, 0 );
 renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
 
@@ -55,18 +55,93 @@ world.solver = new CANNON.GSSolver();
 world.solver.iterations = 10;
 world.solver.tolerance = 0.001;
 
+let gravityResetTimer;
+
+window.addEventListener('wheel', function(event) {
+    clearTimeout(gravityResetTimer);
+    if (event.deltaY < 0) {
+        world.gravity.set(0, -0.8, 0);
+    } else {
+        world.gravity.set(0, 0.8, 0);
+    }
+    gravityResetTimer = setTimeout(() => {
+        world.gravity.set(0, 0, 0);
+    }, 1000);
+});
+
+const exScroll = document.getElementById('exScroll');
+let isDragging = false;
+
+exScroll.addEventListener('mousedown', startScroll);
+exScroll.addEventListener('touchstart', startScroll);
+
+function startScroll(e) {
+    isDragging = true;
+    const startY = e.pageY || e.touches[0].pageY; // 드래그 시작 위치 저장
+
+    const startTop = parseFloat(exScroll.style.top) || 0;
+    const maxTop = container.clientHeight - exScroll.offsetHeight;
+
+    function onScroll(e) {
+        if (!isDragging) return;
+
+        let currentY = e.pageY || e.touches[0].pageY; // 현재 드래그 위치
+        let deltaY = currentY - startY; // 드래그 방향 판단을 위한 차이 계산
+
+        // 중력 방향 결정 로직 추가
+        if (deltaY < 0) {
+            world.gravity.set(0, -1.6, 0); // 위로 드래그하는 경우, Y축 양의 방향으로 중력 적용
+        } else if (deltaY > 0) {
+            world.gravity.set(0, 1.6, 0); // 아래로 드래그하는 경우, Y축 음의 방향으로 중력 적용
+        }
+
+        let newTop = Math.min(maxTop, Math.max(0, startTop + deltaY));
+        exScroll.style.top = `${newTop}px`;
+
+        const scrollPer = newTop / maxTop;
+        container.scrollTop = scrollPer * (container.scrollHeight - container.clientHeight);
+    }
+
+    function stopScroll() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onScroll);
+        document.removeEventListener('mouseup', stopScroll);
+        document.removeEventListener('touchmove', onScroll);
+        document.removeEventListener('touchend', stopScroll);
+
+        // 드래그 종료 후 중력 (0, 0, 0)으로 재설정
+        world.gravity.set(0, 0, 0);
+    }
+
+    document.addEventListener('mousemove', onScroll);
+    document.addEventListener('mouseup', stopScroll);
+    document.addEventListener('touchmove', onScroll);
+    document.addEventListener('touchend', stopScroll);
+
+    e.preventDefault(); // 기본 이벤트 방지
+}
+
 function getShapeForGeometry(geometry, scale) {
     if (geometry instanceof THREE.BoxGeometry) {
-        const size = geometry.parameters.width / 2;
-        return new CANNON.Box(new CANNON.Vec3(size * scale, size * scale, size * scale));
+        const sizeX = geometry.parameters.width / 2 * scale;
+        const sizeY = geometry.parameters.height / 2 * scale;
+        const sizeZ = geometry.parameters.depth / 2 * scale;
+        return new CANNON.Box(new CANNON.Vec3(sizeX, sizeY, sizeZ));
     } else if (geometry instanceof THREE.SphereGeometry) {
-        const radius = geometry.parameters.radius;
-        return new CANNON.Sphere(radius * scale);
+        const radius = geometry.parameters.radius * scale;
+        return new CANNON.Sphere(radius);
     } else if (geometry instanceof THREE.CylinderGeometry) {
-        const radiusTop = geometry.parameters.radiusTop;
-        const radiusBottom = geometry.parameters.radiusBottom;
-        const height = geometry.parameters.height;
-        return new CANNON.Cylinder(radiusTop * scale, radiusBottom * scale, height * scale, geometry.parameters.radialSegments);
+        const radiusTop = geometry.parameters.radiusTop * scale;
+        const radiusBottom = geometry.parameters.radiusBottom * scale;
+        const height = geometry.parameters.height * scale;
+        
+        const shape = new CANNON.Cylinder(radiusTop, radiusBottom, height, geometry.parameters.radialSegments);
+
+        const quaternion = new CANNON.Quaternion();
+        quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);
+        shape.orientation = quaternion;
+        
+        return shape;
     }
 }
 
@@ -161,9 +236,9 @@ function updateScene() {
     }
 }
 
-const growDuration = 0.3;
-const shrinkDuration = 0.9;
-const scaleTo = -0.25;
+const growDuration = 0.24;
+const shrinkDuration = 0.74;
+const scaleTo = -0.15;
 
 function cubicBezier(t, p0, p1, p2, p3) {
     const C = (3 * p1) - (3 * p0) + p3 - p0;
@@ -184,8 +259,7 @@ function animateMeshes() {
             };
         }
         const animation = mesh.animation;
-
-        if (pointPos >= 0.99 && animation.animationPhase === 0) {
+        if ((Math.abs(pointPos - 0.99) < 0.01) && animation.animationPhase === 0) {
             animation.isAnimating = true;
             animation.animationPhase = 1;
             animation.animationStartTime = currentTime;
@@ -199,7 +273,7 @@ function animateMeshes() {
             if (animation.animationPhase === 1) {
                 if (elapsedTime <= growDuration) {
                     const t = elapsedTime / growDuration;
-                    scale = initialScale + cubicBezier(t, 0.15, 0.8, 0.6, 1) * scaleTo;
+                    scale = initialScale + cubicBezier(t, 0.1, 0.8, 0.6, 1) * scaleTo;
                 } else {
                     animation.animationPhase = 2;
                     animation.animationStartTime = currentTime;
@@ -209,7 +283,7 @@ function animateMeshes() {
             else if (animation.animationPhase === 2) {
                 if (elapsedTime <= shrinkDuration) {
                     const t = elapsedTime / shrinkDuration;
-                    scale = (initialScale + scaleTo) - cubicBezier(t, 0.15, 0.8, 0.6, 1) * scaleTo;
+                    scale = (initialScale + scaleTo) - cubicBezier(t, 0.1, 0.8, 0.6, 1) * scaleTo;
                 } else {
                     animation.isAnimating = false;
                     animation.animationPhase = 0;
@@ -319,6 +393,9 @@ animate();
 
 
 //UI BUTTON------------------------------------------------------------
+const filter = document.getElementById('filter');
+const filterBox = document.getElementById('filterBox');
+
 document.getElementById('toggleMode').addEventListener('click', function() {
     const body = document.body;
     const exScroll = document.getElementById('exScroll');
@@ -330,18 +407,41 @@ document.getElementById('toggleMode').addEventListener('click', function() {
         body.classList.add('night-mode');
         exScroll.style.mixBlendMode = 'screen';
         ranDice.src = 'sources/ranNight-Icon.svg';
-        scene.background = new THREE.Color( 0x000000 );
+        filter.src = 'sources/filterNight-Icon.svg';
+        filterBox.style.border = 'solid white 2.5px';
     } else {
         body.classList.remove('night-mode');
         exScroll.style.mixBlendMode = 'multiply';
         ranDice.src = 'sources/ranDay-Icon.svg';
-        scene.background = new THREE.Color( 0xFFFFFF );
-
+        filter.src = 'sources/filterDay-Icon.svg';
+        filterBox.style.border = 'solid black 2.6px';
     }
 
     if (dayNight.src.includes('sources/toDay-Icon.svg')) {
         dayNight.src = 'sources/toNight-Icon.svg';
     } else {
         dayNight.src = 'sources/toDay-Icon.svg';
+    }   
+});
+
+filter.addEventListener('click', function() {
+    console.log(filterBox.style.display)
+    if (filterBox.style.display == 'flex') {
+        filterBox.style.display = 'none';
+    } else {
+        filterBox.style.display = 'flex';
     }
+});
+
+document.addEventListener('click', function(event) {
+    if (event.target !== filter && !filterBox.contains(event.target)) {
+        filterBox.style.display = 'none';
+    }
+});
+
+const opacityRange = document.getElementById('3d-opacity');
+
+opacityRange.addEventListener('input', function() {
+    let opacityValue = opacityRange.value / 10;
+    threeCanvas.style.opacity = opacityValue;
 });

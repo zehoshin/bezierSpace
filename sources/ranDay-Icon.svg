@@ -3,18 +3,24 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#FFFFFF;}
-	.st1{fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
-	.st2{stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
-	.st3{fill:#FFFFFF;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
-	.st4{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
-	.st5{stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
-	.st6{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
-	.st7{fill:#FFFFFF;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
-	.st8{stroke:#FFFFFF;stroke-width:4;stroke-miterlimit:10;}
+	.st0{fill:none;stroke:#FFFFFF;stroke-width:4;stroke-miterlimit:10;}
+	.st1{fill:#FFFFFF;}
+	.st2{fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st3{stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st4{fill:#FFFFFF;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st5{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
+	.st6{stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
+	.st7{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
+	.st8{fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
 	.st9{fill:none;stroke:#FFFF00;stroke-miterlimit:10;}
+	.st10{fill:url(#SVGID_1_);}
+	.st11{fill:url(#SVGID_00000137812924591148476970000006580271408519691924_);}
+	.st12{fill:url(#SVGID_00000163052526629177074780000004252786490896692881_);}
+	.st13{fill:url(#SVGID_00000038393054129989806200000012633007259983796883_);}
+	.st14{fill:url(#SVGID_00000082343067795539445010000009721037339592984196_);}
+	.st15{fill:url(#SVGID_00000021103076052484226420000000416974128053365437_);}
 </style>
-<circle class="st7" cx="50" cy="50" r="44.45"/>
+<circle class="st8" cx="50" cy="50" r="44.45"/>
 <g>
 	<path d="M66.92,25.62l-19.65-5.77c-2.71-0.79-6.59,0.1-8.67,2L23.45,35.65c-2.09,1.9-1.58,4.08,1.12,4.88l19.65,5.77
 		c2.71,0.79,6.59-0.1,8.67-2L68.05,30.5C70.13,28.59,69.63,26.41,66.92,25.62z M42.92,35.65c-2.02-0.59-2.4-2.24-0.84-3.66
