@@ -115,20 +115,20 @@ const tile_Metalness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_
 const tile_Normal = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Normal.jpg" );
 const tile_Roughness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Roughness.jpg" );
 
-const loader = new GLTFLoader();
-loader.load( './sources/gltf/coin/coin.gltf', function ( gltf ) {
+// const loader = new GLTFLoader();
+// loader.load( './sources/gltf/coin/coin.gltf', function ( gltf ) {
     
-    let model = gltf.scene;
-    // model.traverse((child) => {
-    //     if (child.isMesh) {
-    //       child.material = child.material.clone();
-    //       child.material.map = child.material.map.clone();
-    //     }
-    // });
-    model.scale.set(10,10,10);
-    model.rotation.set(10,60,60);
-	scene.add( model );
-});
+//     let model = gltf.scene;
+//     // model.traverse((child) => {
+//     //     if (child.isMesh) {
+//     //       child.material = child.material.clone();
+//     //       child.material.map = child.material.map.clone();
+//     //     }
+//     // });
+//     model.scale.set(10,10,10);
+//     model.rotation.set(10,60,60);
+// 	scene.add( model );
+// });
 
 let scaleFactor = window.innerWidth <= 600 ? 0.2 : 0.4;
 
