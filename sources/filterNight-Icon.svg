@@ -11,30 +11,52 @@
 	.st5{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st6{stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st7{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
-	.st8{fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
-	.st9{fill:none;stroke:#FFFF00;stroke-miterlimit:10;}
-	.st10{fill:url(#SVGID_1_);}
-	.st11{fill:url(#SVGID_00000067209227310743529860000004218138907850651575_);}
-	.st12{fill:url(#SVGID_00000116920019848728770670000004655999851804336014_);}
-	.st13{fill:url(#SVGID_00000040540713268905897620000006357879269221062325_);}
-	.st14{fill:url(#SVGID_00000153703446126844640420000003338411988194703034_);}
-	.st15{fill:url(#SVGID_00000013907292664892642160000016410501813268500907_);}
-	.st16{fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
-	.st17{fill:none;stroke:#FFFFFF;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st8{fill:none;stroke:#FFFF00;stroke-miterlimit:10;}
+	.st9{fill:url(#SVGID_1_);}
+	.st10{fill:url(#SVGID_00000171677995611949524310000007641133975931840414_);}
+	.st11{fill:url(#SVGID_00000057833007153443232590000005266064523476670891_);}
+	.st12{fill:url(#SVGID_00000018198209684794602340000007683091243698025919_);}
+	.st13{fill:url(#SVGID_00000090257015824576209330000001469102721329989521_);}
+	.st14{fill:url(#SVGID_00000101076295111612417640000007988632938044551845_);}
+	.st15{fill:none;stroke:#FFFFFF;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st16{fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
+	.st17{stroke:#FFFFFF;stroke-width:0.5;stroke-miterlimit:10;}
+	.st18{fill:#FFFFFF;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
+	.st19{fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st20{stroke:#000000;stroke-width:0.25;stroke-miterlimit:10;}
 </style>
-<circle class="st0" cx="50" cy="50" r="44.45"/>
+<g>
+	<path class="st1" d="M50,100C22.43,100,0,77.57,0,50C0,22.43,22.43,0,50,0c27.57,0,50,22.43,50,50C100,77.57,77.57,100,50,100z
+		 M50,4.31C24.8,4.31,4.31,24.8,4.31,50c0,25.2,20.5,45.69,45.69,45.69c25.2,0,45.69-20.5,45.69-45.69C95.69,24.8,75.2,4.31,50,4.31
+		z"/>
+</g>
 <g>
 	<g>
-		<line class="st17" x1="27.19" y1="33.67" x2="72.81" y2="33.67"/>
-		<circle class="st1" cx="58.56" cy="33.67" r="7.13"/>
+		<g>
+			<path class="st1" d="M74.55,35.12h-49.1c-1.49,0-2.69-1.2-2.69-2.69c0-1.49,1.2-2.69,2.69-2.69h49.1c1.49,0,2.69,1.2,2.69,2.69
+				C77.24,33.91,76.04,35.12,74.55,35.12z"/>
+		</g>
+		<g>
+			<circle class="st1" cx="59.22" cy="32.43" r="7.67"/>
+		</g>
 	</g>
 	<g>
-		<line class="st17" x1="27.19" y1="66.33" x2="72.81" y2="66.33"/>
-		<circle class="st1" cx="58.56" cy="66.33" r="7.13"/>
+		<g>
+			<path class="st1" d="M74.55,70.26h-49.1c-1.49,0-2.69-1.2-2.69-2.69c0-1.49,1.2-2.69,2.69-2.69h49.1c1.49,0,2.69,1.2,2.69,2.69
+				C77.24,69.06,76.04,70.26,74.55,70.26z"/>
+		</g>
+		<g>
+			<circle class="st1" cx="59.22" cy="67.57" r="7.67"/>
+		</g>
 	</g>
 	<g>
-		<line class="st17" x1="27.19" y1="50" x2="72.81" y2="50"/>
-		<circle class="st1" cx="41.39" cy="50" r="7.13"/>
+		<g>
+			<path class="st1" d="M74.55,52.69h-49.1c-1.49,0-2.69-1.2-2.69-2.69s1.2-2.69,2.69-2.69h49.1c1.49,0,2.69,1.2,2.69,2.69
+				S76.04,52.69,74.55,52.69z"/>
+		</g>
+		<g>
+			<circle class="st1" cx="40.73" cy="50" r="7.67"/>
+		</g>
 	</g>
 </g>
 </svg>

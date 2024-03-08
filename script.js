@@ -1,6 +1,6 @@
 import * as THREE from './three.module.js'
+import { GLTFLoader } from './GLTFLoader.js'
 import * as CANNON from './cannon-es.js'
-
 import { bezierCnt, pointPos, ranColor } from './bezierText.js'
 
 const scene = new THREE.Scene();
@@ -103,20 +103,50 @@ const environmentMapTexture = textureLoader.load([
     './sources/cubeMap/nz.png'
 ])
 
+const foil_AO = new THREE.TextureLoader().load( "./sources/mat/foil/foil_AO.jpg" );
+const foil_Displacement = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Displacement.jpg" );
+const foil_Metalness = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Metalness.jpg" );
+const foil_Normal = new THREE.TextureLoader().load( "./sources/mat/foil/foil_NormalGL.jpg" );
+const foil_Roughness = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Roughness.jpg" );
+
+const tile_AO = new THREE.TextureLoader().load( "./sources/mat/tile/tile_AO.jpg" );
+const tile_Color = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Color.jpg" );
+const tile_Metalness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Metalness.jpg" );
+const tile_Normal = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Normal.jpg" );
+const tile_Roughness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Roughness.jpg" );
+
+const loader = new GLTFLoader();
+loader.load( './sources/gltf/coin/coin.gltf', function ( gltf ) {
+    
+    let model = gltf.scene;
+    // model.traverse((child) => {
+    //     if (child.isMesh) {
+    //       child.material = child.material.clone();
+    //       child.material.map = child.material.map.clone();
+    //     }
+    // });
+    model.scale.set(10,10,10);
+    model.rotation.set(10,60,60);
+	scene.add( model );
+});
+
 let scaleFactor = window.innerWidth <= 600 ? 0.2 : 0.4;
 
 const geometries = [
     new THREE.BoxGeometry(1 * scaleFactor, 1 * scaleFactor, 1 * scaleFactor), // 큐브
-    new THREE.SphereGeometry(0.75 * scaleFactor, 60, 30), // 구
+    new THREE.SphereGeometry(0.75 * scaleFactor, 60, 60), // 구
     new THREE.CylinderGeometry(1 * scaleFactor, 1 * scaleFactor, 0.02, 60), // 원판
 ];
 
 const materials = [
-    new THREE.MeshBasicMaterial(), // 원색
-    new THREE.MeshStandardMaterial(), // Basic
-    new THREE.MeshNormalMaterial(), // Normal
-    (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = true; return m; })(), // Normal.flatShading
-    (() => { const m = new THREE.MeshStandardMaterial({ color: 0xe0e0e0 }); m.roughness = 0.1; m.metalness = 1.0; m.envMap = environmentMapTexture; return m; })() // Metal
+    new THREE.MeshBasicMaterial(), // 0 원색
+    new THREE.MeshStandardMaterial(), // 1 Basic
+    (() => { const m = new THREE.MeshBasicMaterial(); m.wireframe = true; return m; })(), // 2 원색.wireFrame
+    new THREE.MeshNormalMaterial(), // 3 Normal
+    (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = true; return m; })(), // 4 Normal.flatShading
+    (() => { const m = new THREE.MeshStandardMaterial({ color: 0xe0e0e0 }); m.roughness = 0.1; m.metalness = 1.0; m.envMap = environmentMapTexture; return m; })(), // 5 Metal
+    (() => { const m = new THREE.MeshStandardMaterial(); return m; })(), // 6 foil
+    (() => { const m = new THREE.MeshStandardMaterial(); return m; })(), // 7 tile
 ];
 
 function getShapeForGeometry(geometry, scale) {
@@ -126,6 +156,9 @@ function getShapeForGeometry(geometry, scale) {
         const sizeZ = geometry.parameters.depth / 2 * scale;
         return new CANNON.Box(new CANNON.Vec3(sizeX, sizeY, sizeZ));
     } else if (geometry instanceof THREE.SphereGeometry) {
+        const radius = geometry.parameters.radius * scale;
+        return new CANNON.Sphere(radius);
+    } else if (geometry instanceof THREE.IcosahedronGeometry) {
         const radius = geometry.parameters.radius * scale;
         return new CANNON.Sphere(radius);
     } else if (geometry instanceof THREE.CylinderGeometry) {
@@ -191,17 +224,42 @@ function updateScene() {
 
         const geometryIndex = Math.floor(Math.random() * geometries.length);
         const materialIndex = Math.floor(Math.random() * materials.length);
-        const geometry = geometries[geometryIndex];
+        let geometry = geometries[geometryIndex];
         let material;
-        
-        if (materialIndex === 0 || materialIndex === 1) {
-            material = materialIndex === 0 ? 
-                new THREE.MeshBasicMaterial({ color: ranColor() }) : 
-                new THREE.MeshStandardMaterial({ color: ranColor() });
+        if (materialIndex === 0) {
+            material = new THREE.MeshBasicMaterial({ color: ranColor() });
+        } else if (materialIndex === 1) {
+            material = new THREE.MeshStandardMaterial({ color: ranColor() });
+        } else if (materialIndex === 2) { // 원색.wireFrame 재질
+            material = new THREE.MeshBasicMaterial({ color: ranColor(), wireframe: true });
+        } else if (materialIndex === 6) {
+            geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 10);
+            material = new THREE.MeshStandardMaterial({ color: ranColor(),
+                envMap: environmentMapTexture, 
+                aoMap: foil_AO,
+                displacementMap: foil_Displacement,
+                displacementScale: Math.random() * 0.05,
+                metalnessMap: foil_Metalness,
+                normalMap: foil_Normal,
+                roughnessMap: foil_Roughness,
+                roughness: 0.0,
+                metalness: 1.0,
+            });
+        } else if (materialIndex === 7) {
+            geometry = geometries[0];
+                material = new THREE.MeshStandardMaterial({ 
+                envMap: environmentMapTexture, 
+                map: tile_Color,
+                aoMap: tile_AO,
+                metalnessMap: tile_Metalness,
+                normalMap: tile_Normal,
+                roughnessMap: tile_Roughness,
+                roughness: 0.1,
+                metalness: 1.0,
+            }); material.normalScale.set(100, 100);
         } else {
-            material = materials[materialIndex];
+            material = materials[materialIndex]; // 기타 재질 설정
         }
-
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(position.x, position.y, position.z + zPos);
 
@@ -401,6 +459,7 @@ document.getElementById('toggleMode').addEventListener('click', function() {
     const dayNight = document.getElementById('toggleMode');
     const ranDice = document.getElementById('ranDice');
     const saveImg = document.getElementById('saveImg');
+    const record = document.getElementById('record');
 
     bg.classList.toggle('day-mode');
     if (!bg.classList.contains('day-mode')) {
@@ -414,6 +473,7 @@ document.getElementById('toggleMode').addEventListener('click', function() {
         filterBox.style.border = 'solid white 2.5px';
         filterBox.style.color = 'white';
         saveImg.src = 'sources/saveImgNight-Icon.svg';
+        record.src = 'sources/recordNight-Icon.svg';
     } else {
         bg.classList.remove('night-mode');
         boundBox.classList.remove('whiteText');
@@ -425,6 +485,7 @@ document.getElementById('toggleMode').addEventListener('click', function() {
         filterBox.style.border = 'solid black 2.6px';
         filterBox.style.color = 'black';
         saveImg.src = 'sources/saveImgDay-Icon.svg';
+        record.src = 'sources/recordDay-Icon.svg';
     }
     
     if (dayNight.src.includes('sources/toDay-Icon.svg')) {

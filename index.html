@@ -9,20 +9,20 @@
 
 </head>
 <body>
-    
     <div id="bg" class="night-mode"></div>
-    <div id="captureArea" >
-
+    <div id="captureArea">
         <div id="threeCanvas" class="non-clickable"></div>
         <div id="boundBox" class="non-clickable whiteText">
             <div id="container"></div>
         </div>
         <canvas id="bezierCanvas" width="1920" height="1080"></canvas>
     </div>
+<div id="videoNone">
     <img src="sources/toDay-Icon.svg" id="toggleMode" class="btnIcon">
     <img src="sources/ranNight-Icon.svg" id="ranDice" class="btnIcon">
     <img src="sources/filterNight-Icon.svg" id="filter" class="btnIcon">
     <img src="sources/saveImgNight-Icon.svg" id="saveImg" class="btnIcon">
+    <img src="sources/recordNight-Icon.svg" id="record" class="btnIcon">
 
     <div id="filterBox" style="color: white;">
         <label for="tempo" id="tempoText">TEMPO = 2.0s</label>
@@ -30,15 +30,16 @@
         <label for="3d-opacity">3D OPACITY</label>
         <input type="range" id="3d-opacity" name="3d-opacity" min="0" max="10" value="10"/>
     </div>
-    <div id="exScroll"></div>
     <input type="text" id="textInput" placeholder="TEXT~TYPE~WITH [⁓]!" oninput="this.value = this.value.toUpperCase()">
+</div>
+    <div id="exScroll"></div>
 
 
     <script src="jquery-3.7.1.min.js"></script>
-    <script type="module" src="bezier.js"></script>
     <script type="module" src="bezierText.js"></script>
     <script type="module" src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.0/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/RecordRTC/5.6.1/RecordRTC.min.js"></script>
     <script src="saveImg.js"></script>
 
 </body>

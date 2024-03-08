@@ -11,30 +11,51 @@
 	.st5{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st6{stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st7{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
-	.st8{fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
-	.st9{fill:none;stroke:#FFFF00;stroke-miterlimit:10;}
-	.st10{fill:url(#SVGID_1_);}
-	.st11{fill:url(#SVGID_00000090290085942787099420000004605769792045763728_);}
-	.st12{fill:url(#SVGID_00000168107507458803638350000011202731039788983467_);}
-	.st13{fill:url(#SVGID_00000119827240105243338590000002259607672609907632_);}
-	.st14{fill:url(#SVGID_00000031913386252732133550000000971240090225138347_);}
-	.st15{fill:url(#SVGID_00000095297637060857123500000007168411117764215710_);}
-	.st16{fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
-	.st17{fill:none;stroke:#FFFFFF;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st8{fill:none;stroke:#FFFF00;stroke-miterlimit:10;}
+	.st9{fill:url(#SVGID_1_);}
+	.st10{fill:url(#SVGID_00000176760352402719732740000002871274798133982906_);}
+	.st11{fill:url(#SVGID_00000044882434966039753340000009648339703532223159_);}
+	.st12{fill:url(#SVGID_00000110471403108683610010000017106468149466214591_);}
+	.st13{fill:url(#SVGID_00000100374463968177254780000014180672430434147762_);}
+	.st14{fill:url(#SVGID_00000176037549753728988280000005559920005259186078_);}
+	.st15{fill:none;stroke:#FFFFFF;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st16{fill:none;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
+	.st17{stroke:#FFFFFF;stroke-width:0.5;stroke-miterlimit:10;}
+	.st18{fill:#FFFFFF;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
+	.st19{fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st20{stroke:#000000;stroke-width:0.25;stroke-miterlimit:10;}
 </style>
-<circle class="st8" cx="50" cy="50" r="44.45"/>
+<g>
+	<path d="M50,100C22.43,100,0,77.57,0,50C0,22.43,22.43,0,50,0c27.57,0,50,22.43,50,50C100,77.57,77.57,100,50,100z M50,4.31
+		C24.8,4.31,4.31,24.8,4.31,50c0,25.2,20.5,45.69,45.69,45.69c25.2,0,45.69-20.5,45.69-45.69C95.69,24.8,75.2,4.31,50,4.31z"/>
+</g>
 <g>
 	<g>
-		<line class="st16" x1="27.19" y1="33.67" x2="72.81" y2="33.67"/>
-		<circle cx="58.56" cy="33.67" r="7.92"/>
+		<g>
+			<path d="M74.55,35.66h-49.1c-1.78,0-3.23-1.45-3.23-3.23c0-1.78,1.45-3.23,3.23-3.23h49.1c1.78,0,3.23,1.45,3.23,3.23
+				C77.78,34.21,76.34,35.66,74.55,35.66z"/>
+		</g>
+		<g>
+			<circle cx="59.22" cy="32.43" r="8.53"/>
+		</g>
 	</g>
 	<g>
-		<line class="st16" x1="27.19" y1="66.33" x2="72.81" y2="66.33"/>
-		<circle cx="58.56" cy="66.33" r="7.92"/>
+		<g>
+			<path d="M74.55,70.8h-49.1c-1.78,0-3.23-1.45-3.23-3.23c0-1.78,1.45-3.23,3.23-3.23h49.1c1.78,0,3.23,1.45,3.23,3.23
+				C77.78,69.36,76.34,70.8,74.55,70.8z"/>
+		</g>
+		<g>
+			<circle cx="59.22" cy="67.57" r="8.53"/>
+		</g>
 	</g>
 	<g>
-		<line class="st16" x1="27.19" y1="50" x2="72.81" y2="50"/>
-		<circle cx="41.39" cy="50" r="7.92"/>
+		<g>
+			<path d="M74.55,53.23h-49.1c-1.78,0-3.23-1.45-3.23-3.23s1.45-3.23,3.23-3.23h49.1c1.78,0,3.23,1.45,3.23,3.23
+				S76.34,53.23,74.55,53.23z"/>
+		</g>
+		<g>
+			<circle cx="40.73" cy="50" r="8.53"/>
+		</g>
 	</g>
 </g>
 </svg>
