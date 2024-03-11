@@ -9,7 +9,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.z = 6;
 
-const radius = 0.25;
+const radius = 0.2;
 
 const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 5 );
 scene.add( light );
