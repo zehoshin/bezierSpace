@@ -102,32 +102,30 @@ function startScroll(e) {
 //MESH----------------------------------------------------------
 const textureLoader = new THREE.CubeTextureLoader();
 const envSky = textureLoader.load([
-    './sources/cubeMap/sky/px.png',
-    './sources/cubeMap/sky/nx.png',
-    './sources/cubeMap/sky/py.png',
-    './sources/cubeMap/sky/ny.png',
-    './sources/cubeMap/sky/pz.png',
-    './sources/cubeMap/sky/nz.png'
+    './sources/cubeMap/sky/px.jpg',
+    './sources/cubeMap/sky/nx.jpg',
+    './sources/cubeMap/sky/py.jpg',
+    './sources/cubeMap/sky/ny.jpg',
+    './sources/cubeMap/sky/pz.jpg',
+    './sources/cubeMap/sky/nz.jpg'
 ])
 
 const envNightBay = textureLoader.load([
-    './sources/cubeMap/nightBay/px.png',
-    './sources/cubeMap/nightBay/nx.png',
-    './sources/cubeMap/nightBay/py.png',
-    './sources/cubeMap/nightBay/ny.png',
-    './sources/cubeMap/nightBay/pz.png',
-    './sources/cubeMap/nightBay/nz.png'
+    './sources/cubeMap/nightBay/px.jpg',
+    './sources/cubeMap/nightBay/nx.jpg',
+    './sources/cubeMap/nightBay/py.jpg',
+    './sources/cubeMap/nightBay/ny.jpg',
+    './sources/cubeMap/nightBay/pz.jpg',
+    './sources/cubeMap/nightBay/nz.jpg'
 ])
 
 const foil_AO = new THREE.TextureLoader().load( "./sources/mat/foil/foil_AO.jpg" );
 const foil_Displacement = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Displacement.jpg" );
-const foil_Metalness = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Metalness.jpg" );
 const foil_Normal = new THREE.TextureLoader().load( "./sources/mat/foil/foil_NormalGL.jpg" );
 const foil_Roughness = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Roughness.jpg" );
 
 const tile_AO = new THREE.TextureLoader().load( "./sources/mat/tile/tile_AO.jpg" );
 const tile_Color = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Color.jpg" );
-const tile_Metalness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Metalness.jpg" );
 const tile_Normal = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Normal.jpg" );
 const tile_Roughness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Roughness.jpg" );
 
@@ -249,12 +247,12 @@ function updateScene() {
         let ranScale;
 
         if (materialIndex === 8) {
-            loader.load( './sources/gltf/coin.glb', function ( gltf ) {
+            loader.load( './sources/glb/coin.glb', function ( gltf ) {
                 mesh = gltf.scene;
                 mesh.traverse(function (child) {
                     if (child.isMesh) {
                         child.material.envMap = envNightBay;
-                        child.material.color = new THREE.Color(Math.random() < 0.5 ? '#ffffff' : '#ffea00')
+                        child.material.color = new THREE.Color('#ffea00');
                         child.material.roughness = 0.1;
                         child.material.metalness = 1.0;
                     }
@@ -281,7 +279,7 @@ function updateScene() {
                 meshes.push(mesh);
             });
         } else if (materialIndex === 9) {
-            loader.load( './sources/gltf/asteroid.glb', function ( gltf ) {
+            loader.load( './sources/glb/asteroid.glb', function ( gltf ) {
                 mesh = gltf.scene;
                 mesh.traverse(function (child) {
                     if (child.isMesh) {
@@ -334,22 +332,19 @@ function updateScene() {
                 aoMap: foil_AO,
                 displacementMap: foil_Displacement,
                 displacementScale: Math.random() * 0.05,
-                metalnessMap: foil_Metalness,
                 normalMap: foil_Normal,
                 roughnessMap: foil_Roughness,
-                roughness: 0.0,
                 metalness: 1.0,
             });
         } else if (materialIndex === 7) {
             geometry = geometries[0];
                 material = new THREE.MeshStandardMaterial({ 
                 envMap: envSky, 
+                envMapIntensity: 1.6,
                 map: tile_Color,
                 aoMap: tile_AO,
-                metalnessMap: tile_Metalness,
                 normalMap: tile_Normal,
                 roughnessMap: tile_Roughness,
-                roughness: 0.1,
                 metalness: 1.0,
             }); material.normalScale.set(100, 100);
         } else {
