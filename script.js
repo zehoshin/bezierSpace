@@ -9,7 +9,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.z = 6;
 
-const radius = 0.2;
+const radius = window.innerWidth <= 600 ? 0.12 : 0.2;
 
 const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 5 );
 scene.add( light );
@@ -153,8 +153,8 @@ const materials = [
     'metal', // 5 Metal
     'foil', // 6 foil
     'tile', // 7 tile
-    'coinGlb', // 8 coinGlb
-    'asteroidGlb', // 9 asteroidGlb
+    'coin', // 8 coin
+    'asteroid', // 9 asteroid
 ];
 
 function getShapeForGeometry(geometry, scale) {
@@ -177,11 +177,11 @@ function getShapeForGeometry(geometry, scale) {
         const shape = new CANNON.Cylinder(radiusTop, radiusBottom, height, geometry.parameters.radialSegments);
 
         return shape;
-    } else if (geometry === 'coinGlb') {
+    } else if (geometry === 'coin') {
         const shape = new CANNON.Cylinder(0.141 * scale, 0.141 * scale, 0.025 * scale, 20);
 
         return shape;
-    } else if (geometry === 'asteroidGlb') {
+    } else if (geometry === 'asteroid') {
         const shape = new CANNON.Sphere(0.202 * scale);
         return shape;
     }
@@ -202,6 +202,61 @@ const meshes = [];
 const zPos = -2.4
 let mesh;
 let scaleTo = -0.15;
+
+function loadGlb({path, geometry, position, ranScale, scaleToValue}) {
+    loader.load(path, function(gltf) {
+        const model = gltf.scene;
+  
+        model.traverse(function(child) {
+          if (child.isMesh) {
+            if ( geometry === 'coin') {
+              child.material.envMap = envNightBay;
+              child.material.color = new THREE.Color('#ffea00');
+              child.material.roughness = 0.1;
+              child.material.metalness = 1.0;
+            } else if ( geometry === 'asteroid') {
+              child.material.color = new THREE.Color(ranGreyColor());
+              child.material.envMap = envSky; 
+              child.material.envMapIntensity = 2;
+              child.material.metalness = 0.3;
+            } 
+          }
+        });
+  
+        model.position.set(position.x, position.y, position.z + zPos);
+        model.scale.set(ranScale, ranScale, ranScale);
+        model.userData.initialScale = ranScale;
+        const shape = getShapeForGeometry(geometry, ranScale);                
+  
+        const body = new CANNON.Body({
+          mass: 5, 
+          material: new CANNON.Material({friction: 0.1, restitution: 0.9})
+      });
+        
+        body.addShape(shape);
+        body.position.copy(position);
+        setRanRotation(model, body);
+  
+        world.addBody(body);
+        model.body = body;
+        scaleTo = scaleToValue;
+        scene.add(model);
+        meshes.push(model);
+    });
+}
+
+function getRandomPosition(radius) {
+    let position, distanceSquared;
+    do {
+        position = new THREE.Vector3(
+            (Math.random() - 0.5) * 2 * radius,
+            (Math.random() - 0.5) * 2 * radius,
+            (Math.random() - 0.5) * 2 * radius
+        );
+        distanceSquared = position.x ** 2 + position.y ** 2 + position.z ** 2;
+    } while (distanceSquared > radius ** 2);
+    return position;
+}
 
 function ranGreyColor() {
     const value = Math.floor(Math.random() * 150 + 50); // 50~200
@@ -228,17 +283,8 @@ function updateScene() {
 
     // bezierCnt에 따라 새로운 Mesh 생성 및 추가
     for (let i = 0; i < bezierCnt; i++) {
-        let position, distanceSquared;
-        do {
-            // XYZ 좌표를 랜덤하게 선택합니다.
-            position = new THREE.Vector3(
-                (Math.random() - 0.5) * 2 * radius,
-                (Math.random() - 0.5) * 2 * radius,
-                (Math.random() - 0.5) * 2 * radius
-            );
-            // 중심에서 선택된 좌표까지의 거리의 제곱을 계산합니다.
-            distanceSquared = position.x * position.x + position.y * position.y + position.z * position.z;
-        } while (distanceSquared > radius * radius);
+
+        const position = getRandomPosition(radius);
 
         const geometryIndex = Math.floor(Math.random() * geometries.length);
         const materialIndex = Math.floor(Math.random() * materials.length);
@@ -246,133 +292,85 @@ function updateScene() {
         let material;
         let ranScale;
 
-        if (materialIndex === 8) {
-            loader.load( './sources/glb/coin.glb', function ( gltf ) {
-                mesh = gltf.scene;
-                mesh.traverse(function (child) {
-                    if (child.isMesh) {
-                        child.material.envMap = envNightBay;
-                        child.material.color = new THREE.Color('#ffea00');
-                        child.material.roughness = 0.1;
-                        child.material.metalness = 1.0;
-                    }
-                });
-                mesh.position.set(position.x, position.y, position.z + zPos);
-                ranScale = Math.random() * 1.5 + 1;
-                mesh.scale.set(ranScale, ranScale, ranScale);
-                mesh.userData.initialScale = ranScale;
-                geometry = 'coinGlb';
-                const shape = getShapeForGeometry(geometry, ranScale);                
-                const body = new CANNON.Body({
-                    mass: 5, 
-                    material: new CANNON.Material({friction: 0.1, restitution: 0.9})
-                });
-                body.addShape(shape);
-                body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-                
-                setRanRotation(mesh, body);
-
-                world.addBody(body);
-                mesh.body = body;
-                scaleTo = -0.1;
-                scene.add(mesh);
-                meshes.push(mesh);
+        if (materials[materialIndex] == 'coin') {
+            loadGlb({
+                path: './sources/glb/coin.glb',
+                geometry: 'coin',
+                position,
+                ranScale: window.innerWidth <= 600 ? Math.random() * 1 + 0.5 : Math.random() * 1.5 + 1,
+                scaleToValue: -0.1,
             });
-        } else if (materialIndex === 9) {
-            loader.load( './sources/glb/asteroid.glb', function ( gltf ) {
-                mesh = gltf.scene;
-                mesh.traverse(function (child) {
-                    if (child.isMesh) {
-                        child.material.color = new THREE.Color(ranGreyColor());
-                        child.material.envMap = envSky; 
-                        child.material.envMapIntensity = 2;
-                        child.material.metalness = 0.3;
-                    }
-                });
-                mesh.position.set(position.x, position.y, position.z + zPos);
-                ranScale = Math.random() * 1 + 0.5;
-                mesh.scale.set(ranScale, ranScale, ranScale);
-                mesh.userData.initialScale = ranScale;
-                geometry = 'asteroidGlb';
-                const shape = getShapeForGeometry(geometry, ranScale);                
-                const body = new CANNON.Body({
-                    mass: 5, 
-                    material: new CANNON.Material({friction: 0.1, restitution: 0.9})
-                });
-                body.addShape(shape);
-                body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-                
-                setRanRotation(mesh, body);
-
-                world.addBody(body);
-                mesh.body = body;
-                scaleTo = -0.1;
-                scene.add(mesh);
-                meshes.push(mesh);
+        } else if (materials[materialIndex] == 'asteroid') {
+            loadGlb({
+                path: './sources/glb/asteroid.glb',
+                geometry: 'asteroid',
+                position,
+                ranScale: window.innerWidth <= 600 ? Math.random() * 0.5 + 0.5 : Math.random() * 1 + 0.5,
+                scaleToValue: -0.1,
             });
         }
-        else { if (materialIndex === 0) {
-            material = new THREE.MeshBasicMaterial({ color: ranColor() });
-        } else if (materialIndex === 1) {
-            material = new THREE.MeshStandardMaterial({ color: ranColor() });
-        } else if (materialIndex === 2) { // 원색.wireFrame 재질
-            material = new THREE.MeshBasicMaterial({ color: ranColor(), wireframe: true });
-        } else if (materialIndex === 5) {
-            geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 5);
-            material = new THREE.MeshStandardMaterial({ color: ranColor(),
-                envMap: envSky,
-                map: fake_Color, 
-                normalMap: fake_Normal,
-                roughnessMap: fake_Roughness,
-            });
-        } else if (materialIndex === 6) {
-            geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 10);
-            material = new THREE.MeshStandardMaterial({ color: ranColor(),
-                envMap: envSky, 
-                aoMap: foil_AO,
-                displacementMap: foil_Displacement,
-                displacementScale: Math.random() * 0.05,
-                normalMap: foil_Normal,
-                roughnessMap: foil_Roughness,
-                metalness: 1.0,
-            });
-        } else if (materialIndex === 7) {
-            geometry = geometries[0];
+            else { if (materials[materialIndex] == '2dColor') {
+                material = new THREE.MeshBasicMaterial({ color: ranColor() });
+            } else if (materials[materialIndex] == 'basicColor') {
+                material = new THREE.MeshStandardMaterial({ color: ranColor() });
+            } else if (materials[materialIndex] == 'wireFrame') {
+                material = new THREE.MeshBasicMaterial({ color: ranColor(), wireframe: true });
+            } else if (materials[materialIndex] == 'metal') {
+                geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 5);
+                material = new THREE.MeshStandardMaterial({ color: ranColor(),
+                    envMap: envSky,
+                    map: fake_Color, 
+                    normalMap: fake_Normal,
+                    roughnessMap: fake_Roughness,
+                });
+            } else if (materials[materialIndex] == 'foil') {
+                geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 10);
+                material = new THREE.MeshStandardMaterial({ color: ranColor(),
+                    envMap: envSky, 
+                    aoMap: foil_AO,
+                    displacementMap: foil_Displacement,
+                    displacementScale: window.innerWidth <= 600 ? Math.random() * 0.03 : Math.random() * 0.05,
+                    normalMap: foil_Normal,
+                    roughnessMap: foil_Roughness,
+                    metalness: 1.0,
+                });
+            } else if (materials[materialIndex] == 'tile') {
+                geometry = geometries[0];
                 material = new THREE.MeshStandardMaterial({ 
-                envMap: envSky, 
-                envMapIntensity: 1.6,
-                map: tile_Color,
-                aoMap: tile_AO,
-                normalMap: tile_Normal,
-                roughnessMap: tile_Roughness,
-                metalness: 1.0,
-            }); material.normalScale.set(100, 100);
-        } else {
-            material = materials[materialIndex]; // 기타 재질 설정
-        }
-        mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(position.x, position.y, position.z + zPos);
-        ranScale = Math.random() * 0.5 + 0.5;
-        mesh.scale.set(ranScale, ranScale, ranScale);
-        mesh.userData.initialScale = ranScale;
+                    envMap: envSky, 
+                    envMapIntensity: 1.2,
+                    map: tile_Color,
+                    aoMap: tile_AO,
+                    normalMap: tile_Normal,
+                    roughnessMap: tile_Roughness,
+                    metalness: 0.4,
+                }); material.normalScale.set(100, 100);
+            } else {
+                material = materials[materialIndex];
+            }
+            mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(position.x, position.y, position.z + zPos);
+            ranScale = Math.random() * 0.5 + 0.5;
+            mesh.scale.set(ranScale, ranScale, ranScale);
+            mesh.userData.initialScale = ranScale;
 
-        const shape = getShapeForGeometry(geometry, ranScale);
-        if (!shape) continue;
-        
-        const body = new CANNON.Body({
-            mass: 1, 
-            material: new CANNON.Material({friction: 0.1, restitution: 0.9})
-        });
-        body.addShape(shape);
-        body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-        
-        setRanRotation(mesh, body);
-        
-        world.addBody(body);
-        mesh.body = body;
+            const shape = getShapeForGeometry(geometry, ranScale);
+            if (!shape) continue;
+            
+            const body = new CANNON.Body({
+                mass: 1, 
+                material: new CANNON.Material({friction: 0.1, restitution: 0.9})
+            });
+            body.addShape(shape);
+            body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+            
+            setRanRotation(mesh, body);
+            
+            world.addBody(body);
+            mesh.body = body;
 
-        scene.add(mesh);
-        meshes.push(mesh);
+            scene.add(mesh);
+            meshes.push(mesh);
         }
     }
 
@@ -456,11 +454,11 @@ function applyRadialForces() {
         radialVector.y -= 0;
         radialVector.z -= 0; // 중심점(0, 0, 0)에서 벡터를 뺌
         
-        radialVector.normalize(); // 방향만 유지
-        const forceMagnitude = -0.025 * body.mass; // 힘의 크기 설정
+        radialVector.normalize(); // 방향 유지
+        const forceMagnitude = -0.025 * body.mass; // 힘 크기 설정
         radialVector.x *= forceMagnitude;
         radialVector.y *= forceMagnitude;
-        radialVector.z *= forceMagnitude; // 힘의 크기 조정
+        radialVector.z *= forceMagnitude;
         body.applyForce(radialVector, body.position);
     });
 }
@@ -472,7 +470,7 @@ function createBoxBoundary(width, height, depth) {
     const halfHeight = height * viewSize.height / 2;
     const halfDepth = depth / 2;
 
-    // 육면체의 벽을 생성하는 함수
+    // 육면체 벽을 생성
     function createWall(wallPosition, wallSize) {
         const shape = new CANNON.Box(new CANNON.Vec3(wallSize.x / 2, wallSize.y / 2, wallSize.z / 2));
         const wallBody = new CANNON.Body({ mass: 0 });
@@ -481,18 +479,18 @@ function createBoxBoundary(width, height, depth) {
         world.addBody(wallBody);
     }
 
-    // 상단, 하단
+    // up, down
     createWall(new CANNON.Vec3(0, halfHeight, 0 + zPos), new CANNON.Vec3(width * viewSize.width, wallThickness, depth));
     createWall(new CANNON.Vec3(0, -halfHeight, 0 + zPos), new CANNON.Vec3(width * viewSize.width, wallThickness, depth));
-    // 왼쪽, 오른쪽
+    // left, right
     createWall(new CANNON.Vec3(-halfWidth, 0, 0 + zPos), new CANNON.Vec3(wallThickness, height * viewSize.height, depth));
     createWall(new CANNON.Vec3(halfWidth, 0, 0 + zPos), new CANNON.Vec3(wallThickness, height * viewSize.height, depth));
-    // 전면, 후면
+    // front, back
     createWall(new CANNON.Vec3(0, 0, halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
     createWall(new CANNON.Vec3(0, 0, -halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
 }
 
-// 카메라의 z 위치에서 볼 수 있는 뷰의 크기를 계산
+// 카메라의 z 위치에서 볼 수 있는 뷰의 크기 계산
 function getViewSizeAtDepth(depth) {
     const fovInRadians = (camera.fov * Math.PI) / 180;
     const height = 2 * Math.tan(fovInRadians / 2) * Math.abs(depth);
