@@ -1,22 +1,40 @@
-import * as THREE from './three.module.js'
-import { GLTFLoader } from './GLTFLoader.js'
-import * as CANNON from './cannon-es.js'
-import { bezierCnt, pointPos, ranColor } from './bezierText.js'
-import CannonDebugger from './cannon-es-debugger.js'
+import * as THREE from './three.module.js';
+import * as CANNON from './cannon-es.js';
+import { Line2 } from "./lines/Line2.js";
+import { LineMaterial } from "./lines/LineMaterial.js";
+import { LineSegmentsGeometry } from "./lines/LineSegmentsGeometry.js";
+
+import { EffectComposer } from './postprocessing/EffectComposer.js';
+import { RenderPass } from './postprocessing/RenderPass.js';
+import { UnrealBloomPass } from './postprocessing/UnrealBloomPass.js';
+import { OutputPass } from './postprocessing/OutputPass.js';
+
+
+import { bezierCnt, pointPos, ranColor, ranTextAlign } from './bezierText.js';
+import CannonDebugger from './cannon-es-debugger.js';
 
 const scene = new THREE.Scene();
+// scene.background = new THREE.Color( 0xffffff );
 
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 6;
+camera.position.z = 10;
 
-const radius = window.innerWidth <= 600 ? 0.12 : 0.2;
+let extraCnt
+let radius 
 
-const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 5 );
+function genRadius() {
+    if ( bezierCnt + extraCnt > 5 ) {
+        radius = window.innerWidth <= 600 ? 0.3 : 0.5;
+    } else {
+        radius = window.innerWidth <= 600 ? 0.1 : 0.2;
+    }
+}
+
+
+window.innerWidth <= 600 ? 0.3 : 0.5;
+
+const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 1 );
 scene.add( light );
-
-// const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-// directionalLight.position.set(-10, 10, 10);
-// scene.add( directionalLight );
 
 const renderer = new THREE.WebGLRenderer( { alpha: true, preserveDrawingBuffer: true } ); 
 renderer.setClearColor( 0x000000, 0 );
@@ -25,9 +43,29 @@ const threeCanvas = document.getElementById('threeCanvas');
 
 threeCanvas.appendChild( renderer.domElement );
 
+let composer
+
+function init() {
+    const renderScene = new RenderPass( scene, camera );
+
+    const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+    bloomPass.threshold = 0.1;
+    bloomPass.strength = 0.14;
+    bloomPass.radius = 1.0;
+
+    const outputPass = new OutputPass();
+
+    composer = new EffectComposer( renderer );
+    composer.addPass( renderScene );
+    composer.addPass( bloomPass );
+    composer.addPass( outputPass );
+}
+
+init();
+
 // cannon-es.js 물리 세계 생성
 const world = new CANNON.World();
-world.gravity.set(0,0,0);
+world.gravity.set(0, 0, 0);
 world.broadphase = new CANNON.SAPBroadphase(world);
 world.solver = new CANNON.GSSolver();
 
@@ -110,51 +148,17 @@ const envSky = textureLoader.load([
     './sources/cubeMap/sky/nz.jpg'
 ])
 
-const envNightBay = textureLoader.load([
-    './sources/cubeMap/nightBay/px.jpg',
-    './sources/cubeMap/nightBay/nx.jpg',
-    './sources/cubeMap/nightBay/py.jpg',
-    './sources/cubeMap/nightBay/ny.jpg',
-    './sources/cubeMap/nightBay/pz.jpg',
-    './sources/cubeMap/nightBay/nz.jpg'
-])
-
-const foil_AO = new THREE.TextureLoader().load( "./sources/mat/foil/foil_AO.jpg" );
-const foil_Displacement = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Displacement.jpg" );
-const foil_Normal = new THREE.TextureLoader().load( "./sources/mat/foil/foil_NormalGL.jpg" );
-const foil_Roughness = new THREE.TextureLoader().load( "./sources/mat/foil/foil_Roughness.jpg" );
-
-const tile_AO = new THREE.TextureLoader().load( "./sources/mat/tile/tile_AO.jpg" );
-const tile_Color = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Color.jpg" );
-const tile_Normal = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Normal.jpg" );
-const tile_Roughness = new THREE.TextureLoader().load( "./sources/mat/tile/tile_Roughness.jpg" );
-
 const fake_Color = new THREE.TextureLoader().load( "" );
 const fake_Normal = new THREE.TextureLoader().load( "" );
 const fake_Roughness = new THREE.TextureLoader().load( "" );
-
-
-const loader = new GLTFLoader();
-
-let scaleFactor = window.innerWidth <= 600 ? 0.2 : 0.4;
-
-const geometries = [
-    new THREE.BoxGeometry(1 * scaleFactor, 1 * scaleFactor, 1 * scaleFactor), // 0 큐브
-    new THREE.SphereGeometry(0.75 * scaleFactor, 60, 60), // 1 구
-    new THREE.CylinderGeometry(1 * scaleFactor, 1 * scaleFactor, 0.02, 60), // 2 원판
-];
 
 const materials = [
     '2dColor', // 0 원색
     'basicColor', // 1 Basic
     'wireFrame', // 2 원색.wireFrame
-    new THREE.MeshNormalMaterial(), // 3 Normal
+    // new THREE.MeshNormalMaterial(), // 3 Normal
     (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = true; return m; })(), // 4 Normal.flatShading
     'metal', // 5 Metal
-    'foil', // 6 foil
-    'tile', // 7 tile
-    'coin', // 8 coin
-    'asteroid', // 9 asteroid
 ];
 
 function getShapeForGeometry(geometry, scale) {
@@ -166,9 +170,6 @@ function getShapeForGeometry(geometry, scale) {
     } else if (geometry instanceof THREE.SphereGeometry) {
         const radius = geometry.parameters.radius * scale;
         return new CANNON.Sphere(radius);
-    } else if (geometry instanceof THREE.IcosahedronGeometry) {
-        const radius = geometry.parameters.radius * scale;
-        return new CANNON.Sphere(radius);
     } else if (geometry instanceof THREE.CylinderGeometry) {
         const radiusTop = geometry.parameters.radiusTop * scale;
         const radiusBottom = geometry.parameters.radiusBottom * scale;
@@ -176,13 +177,6 @@ function getShapeForGeometry(geometry, scale) {
         
         const shape = new CANNON.Cylinder(radiusTop, radiusBottom, height, geometry.parameters.radialSegments);
 
-        return shape;
-    } else if (geometry === 'coin') {
-        const shape = new CANNON.Cylinder(0.141 * scale, 0.141 * scale, 0.025 * scale, 20);
-
-        return shape;
-    } else if (geometry === 'asteroid') {
-        const shape = new CANNON.Sphere(0.202 * scale);
         return shape;
     }
 }
@@ -203,48 +197,6 @@ const zPos = -2.4
 let mesh;
 let scaleTo = -0.15;
 
-function loadGlb({path, geometry, position, ranScale, scaleToValue}) {
-    loader.load(path, function(gltf) {
-        const model = gltf.scene;
-  
-        model.traverse(function(child) {
-          if (child.isMesh) {
-            if ( geometry === 'coin') {
-              child.material.envMap = envNightBay;
-              child.material.color = new THREE.Color('#ffea00');
-              child.material.roughness = 0.1;
-              child.material.metalness = 1.0;
-            } else if ( geometry === 'asteroid') {
-              child.material.color = new THREE.Color(ranGreyColor());
-              child.material.envMap = envSky; 
-              child.material.envMapIntensity = 2;
-              child.material.metalness = 0.3;
-            } 
-          }
-        });
-  
-        model.position.set(position.x, position.y, position.z + zPos);
-        model.scale.set(ranScale, ranScale, ranScale);
-        model.userData.initialScale = ranScale;
-        const shape = getShapeForGeometry(geometry, ranScale);                
-  
-        const body = new CANNON.Body({
-          mass: 5, 
-          material: new CANNON.Material({friction: 0.1, restitution: 0.9})
-      });
-        
-        body.addShape(shape);
-        body.position.copy(position);
-        setRanRotation(model, body);
-  
-        world.addBody(body);
-        model.body = body;
-        scaleTo = scaleToValue;
-        scene.add(model);
-        meshes.push(model);
-    });
-}
-
 function getRandomPosition(radius) {
     let position, distanceSquared;
     do {
@@ -258,11 +210,171 @@ function getRandomPosition(radius) {
     return position;
 }
 
-function ranGreyColor() {
-    const value = Math.floor(Math.random() * 150 + 50); // 50~200
-    const hex = value.toString(16).padStart(2, '0');
-    return `#${hex}${hex}${hex}`;
+function ranNeon() {
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = Math.random() * (100 - 70) + 70;
+    const lightness = Math.random() * (80 - 50) + 50;
+
+    function hslToRgb(h, s, l) {
+        s /= 100;
+        l /= 100;
+        let c = (1 - Math.abs(2 * l - 1)) * s,
+            x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+            m = l - c/2,
+            r = 0,
+            g = 0,
+            b = 0;
+        if (0 <= h && h < 60) {
+            r = c; g = x; b = 0;
+        } else if (60 <= h && h < 120) {
+            r = x; g = c; b = 0;
+        } else if (120 <= h && h < 180) {
+            r = 0; g = c; b = x;
+        } else if (180 <= h && h < 240) {
+            r = 0; g = x; b = c;
+        } else if (240 <= h && h < 300) {
+            r = x; g = 0; b = c;
+        } else if (300 <= h && h < 360) {
+            r = c; g = 0; b = x;
+        }
+        r = Math.round((r + m) * 255);
+        g = Math.round((g + m) * 255);
+        b = Math.round((b + m) * 255);
+        return {r, g, b};
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map(x => {
+            const hex = x.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        }).join('');
+    }
+
+    const {r, g, b} = hslToRgb(hue, saturation, lightness);
+    return rgbToHex(r, g, b);
 }
+
+let segments;
+
+function addMesh() {
+    const position = getRandomPosition(radius);
+    const materialIndex = Math.floor(Math.random() * materials.length);
+    
+    let scaleFactor = window.innerWidth <= 600 ? 0.2 : 0.4;
+    let ranSizeX = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2
+    let ranSizeY = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2
+    let ranSizeZ = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2 
+    let ranSizeH = Math.random() * 0.09 + 0.01; // 0.01 ~ 0.10 
+    let ranSizeW = Math.random() * 0.4 + 0.2; // 0.2 ~ 0.6
+
+    if (materials[materialIndex] === 'wireFrame') {
+        segments = 10;
+    } else {
+        segments = 60; // 다른 재료일 경우 기본값으로 재설정
+    }
+    
+    const geometries = [
+        new THREE.BoxGeometry(ranSizeX * scaleFactor, ranSizeY * scaleFactor, ranSizeZ * scaleFactor), // 0 큐브
+        new THREE.SphereGeometry(0.75 * scaleFactor, segments, segments), // 1 구
+        new THREE.CylinderGeometry(ranSizeX * scaleFactor, ranSizeX * scaleFactor, ranSizeH, segments), // 2 원판
+        new THREE.CylinderGeometry(ranSizeW * scaleFactor, ranSizeW * scaleFactor, ranSizeX, segments), // 3 원기둥
+    ];
+
+    const geometryIndex = Math.floor(Math.random() * geometries.length);
+
+    let geometry = geometries[geometryIndex];
+    let material;
+    let ranScale;
+
+    if (materials[materialIndex] === 'wireFrame') {
+        const edges = new THREE.EdgesGeometry(geometry);
+        const lineGeometry = new LineSegmentsGeometry().fromEdgesGeometry(edges);
+        const lineMaterial = new LineMaterial({
+            color: ranNeon(),
+            linewidth: window.innerWidth <= 600 ? 2 : 4, 
+        });
+
+        const line = new Line2(lineGeometry, lineMaterial);
+        line.computeLineDistances();
+        mesh = line;
+
+        lineMaterial.resolution.set(window.innerWidth, window.innerHeight);
+    } else {
+    
+        if (materials[materialIndex] === '2dColor') {
+            material = new THREE.MeshBasicMaterial({ color: ranNeon() });
+        } else if (materials[materialIndex] === 'basicColor') {
+            material = new THREE.MeshStandardMaterial({ 
+                color: ranNeon(), emissive: ranNeon() });
+        } else if (materials[materialIndex] === 'metal') {
+            material = new THREE.MeshStandardMaterial({ 
+                color: ranNeon(),
+                emissive: ranNeon(),
+                emissiveIntensity: 0.6,
+                envMap: envSky,
+                map: fake_Color, 
+                normalMap: fake_Normal,
+                roughnessMap: fake_Roughness,
+            });
+        } else {
+            material = materials[materialIndex];
+        }
+    
+    mesh = new THREE.Mesh(geometry, material);
+
+    }
+
+    mesh.position.set(position.x, position.y, position.z + zPos);
+    ranScale = Math.random() * 0.75 + 0.5; // 0.5 ~ 1.25
+    mesh.scale.set(ranScale, ranScale, ranScale);
+    mesh.userData.initialScale = ranScale;
+
+    const shape = getShapeForGeometry(geometry, ranScale);
+    
+    const body = new CANNON.Body({
+        mass: 10, 
+        material: new CANNON.Material({friction: 0.1, restitution: 0.9})
+    });
+    body.addShape(shape);
+    body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+    
+    setRanRotation(mesh, body);
+    
+    world.addBody(body);
+    mesh.body = body;
+    scene.add(mesh);
+    meshes.push(mesh);
+    genRadius();
+}
+
+const plusCnt = document.getElementById('plusCnt');
+const minusCnt = document.getElementById('minusCnt');
+const num = document.getElementById('num');
+extraCnt = Number(num.innerHTML);
+
+function removeMesh() {
+    if (meshes.length > 0) {
+        const meshToRemove = meshes.pop();
+        scene.remove(meshToRemove);
+        if (meshToRemove.body) {
+            world.removeBody(meshToRemove.body);
+        }
+    }
+}
+
+plusCnt.addEventListener('click', function() {
+    extraCnt += 1;
+    num.innerHTML = bezierCnt + extraCnt;
+    addMesh();
+});
+
+minusCnt.addEventListener('click', function() {
+    if (bezierCnt + extraCnt > 0) {
+        extraCnt -= 1;
+        num.innerHTML = bezierCnt + extraCnt;
+        removeMesh();
+    }
+});
 
 function updateScene() {
     // 현재 Scene 내의 모든 Mesh 삭제
@@ -281,103 +393,31 @@ function updateScene() {
         }
     }
 
-    // bezierCnt에 따라 새로운 Mesh 생성 및 추가
-    for (let i = 0; i < bezierCnt; i++) {
-
-        const position = getRandomPosition(radius);
-
-        const geometryIndex = Math.floor(Math.random() * geometries.length);
-        const materialIndex = Math.floor(Math.random() * materials.length);
-        let geometry = geometries[geometryIndex];
-        let material;
-        let ranScale;
-
-        if (materials[materialIndex] == 'coin') {
-            loadGlb({
-                path: './sources/glb/coin.glb',
-                geometry: 'coin',
-                position,
-                ranScale: window.innerWidth <= 600 ? Math.random() * 1 + 0.5 : Math.random() * 1.5 + 1,
-                scaleToValue: -0.1,
-            });
-        } else if (materials[materialIndex] == 'asteroid') {
-            loadGlb({
-                path: './sources/glb/asteroid.glb',
-                geometry: 'asteroid',
-                position,
-                ranScale: window.innerWidth <= 600 ? Math.random() * 0.5 + 0.5 : Math.random() * 1 + 0.5,
-                scaleToValue: -0.1,
-            });
-        }
-            else { if (materials[materialIndex] == '2dColor') {
-                material = new THREE.MeshBasicMaterial({ color: ranColor() });
-            } else if (materials[materialIndex] == 'basicColor') {
-                material = new THREE.MeshStandardMaterial({ color: ranColor() });
-            } else if (materials[materialIndex] == 'wireFrame') {
-                material = new THREE.MeshBasicMaterial({ color: ranColor(), wireframe: true });
-            } else if (materials[materialIndex] == 'metal') {
-                geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 5);
-                material = new THREE.MeshStandardMaterial({ color: ranColor(),
-                    envMap: envSky,
-                    map: fake_Color, 
-                    normalMap: fake_Normal,
-                    roughnessMap: fake_Roughness,
-                });
-            } else if (materials[materialIndex] == 'foil') {
-                geometry = new THREE.IcosahedronGeometry(0.75 * scaleFactor, 10);
-                material = new THREE.MeshStandardMaterial({ color: ranColor(),
-                    envMap: envSky, 
-                    aoMap: foil_AO,
-                    displacementMap: foil_Displacement,
-                    displacementScale: window.innerWidth <= 600 ? Math.random() * 0.03 : Math.random() * 0.05,
-                    normalMap: foil_Normal,
-                    roughnessMap: foil_Roughness,
-                    metalness: 1.0,
-                });
-            } else if (materials[materialIndex] == 'tile') {
-                geometry = geometries[0];
-                material = new THREE.MeshStandardMaterial({ 
-                    envMap: envSky, 
-                    envMapIntensity: 1.2,
-                    map: tile_Color,
-                    aoMap: tile_AO,
-                    normalMap: tile_Normal,
-                    roughnessMap: tile_Roughness,
-                    metalness: 0.4,
-                }); material.normalScale.set(100, 100);
-            } else {
-                material = materials[materialIndex];
-            }
-            mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(position.x, position.y, position.z + zPos);
-            ranScale = Math.random() * 0.5 + 0.5;
-            mesh.scale.set(ranScale, ranScale, ranScale);
-            mesh.userData.initialScale = ranScale;
-
-            const shape = getShapeForGeometry(geometry, ranScale);
-            if (!shape) continue;
-            
-            const body = new CANNON.Body({
-                mass: 1, 
-                material: new CANNON.Material({friction: 0.1, restitution: 0.9})
-            });
-            body.addShape(shape);
-            body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-            
-            setRanRotation(mesh, body);
-            
-            world.addBody(body);
-            mesh.body = body;
-
-            scene.add(mesh);
-            meshes.push(mesh);
-        }
+    for (let i = 0; i < bezierCnt + extraCnt; i++) {
+        addMesh();
     }
+    num.innerHTML = bezierCnt + extraCnt;
+    // console.log(bezierCnt, extraCnt, meshes.length)
+}
 
-    if (meshes.length > 0) {
-        mesh = meshes[0];
+const Ding01 = new Audio('./sources/sound/Ding01.mp3');
+const Ding02 = new Audio('./sources/sound/Ding02.mp3');
+const Ding03 = new Audio('./sources/sound/Ding03.mp3');
+const Ding04 = new Audio('./sources/sound/Ding04.mp3');
+
+let audios = [Ding01, Ding02, Ding03, Ding04];
+let audio;
+let currentAudio;
+
+function soundPlay() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
     }
-    
+    audio = audios[Math.floor(Math.random() * audios.length)];
+    audio.volume = 0.2;
+    audio.play();
+    currentAudio = audio;
 }
 
 const growDuration = 0.24;
@@ -392,20 +432,34 @@ function cubicBezier(t, p0, p1, p2, p3) {
 }
 
 function animateMeshes() {
-    const currentTime = (new Date()).getTime() / 1000;
+    const currentTime = (new Date()).getTime() / 500;
+
+    // let animationStarted = false;
+    // if ((Math.abs(pointPos - 0.99) < 0.01) && !animationStarted) {
+    //     animationStarted = true;
+    //     setTimeout(function() {
+    //         soundPlay();
+    //         updateScene();
+    //         ranTextAlign();
+    //         animationStarted = false;
+    //     }, 10);
+    // }
+
     meshes.forEach(mesh => {
         if (!mesh.animation) {
             mesh.animation = {
                 isAnimating: false,
                 animationPhase: 0, // (0: no animation, 1: growing, 2: shrinking)
-                animationStartTime: 0
+                animationStartTime: 0,
             };
         }
         const animation = mesh.animation;
+        
         if ((Math.abs(pointPos - 0.99) < 0.01) && animation.animationPhase === 0) {
             animation.isAnimating = true;
             animation.animationPhase = 1;
             animation.animationStartTime = currentTime;
+
         }
 
         if (animation.isAnimating) {
@@ -422,7 +476,6 @@ function animateMeshes() {
                     animation.animationStartTime = currentTime;
                 }
             }
-
             else if (animation.animationPhase === 2) {
                 if (elapsedTime <= shrinkDuration) {
                     const t = elapsedTime / shrinkDuration;
@@ -432,13 +485,12 @@ function animateMeshes() {
                     animation.animationPhase = 0;
                 }
             }
-
             if (scale !== undefined) {
                 mesh.scale.set(scale, scale, scale);
             }
         }
-        mesh.rotation.x += 0.01;
-        mesh.rotation.y += 0.01;
+        // mesh.rotation.x += 0.01;
+        // mesh.rotation.y += 0.01;
         mesh.rotation.z += 0.01;
 
         const quaternion = new THREE.Quaternion();
@@ -455,7 +507,7 @@ function applyRadialForces() {
         radialVector.z -= 0; // 중심점(0, 0, 0)에서 벡터를 뺌
         
         radialVector.normalize(); // 방향 유지
-        const forceMagnitude = -0.025 * body.mass; // 힘 크기 설정
+        const forceMagnitude = -0.1 * body.mass; // 힘 크기 설정
         radialVector.x *= forceMagnitude;
         radialVector.y *= forceMagnitude;
         radialVector.z *= forceMagnitude;
@@ -463,14 +515,14 @@ function applyRadialForces() {
     });
 }
 
-function createBoxBoundary(width, height, depth) {
-    const viewSize = getViewSizeAtDepth(camera.position.z);
+function createBoundary(width, height, depth) {
+    const viewSize = getViewSize(camera.position.z);
     const wallThickness = 0.01;
     const halfWidth = width * viewSize.width / 2;
     const halfHeight = height * viewSize.height / 2;
     const halfDepth = depth / 2;
 
-    // 육면체 벽을 생성
+    // 육면체 벽 생성
     function createWall(wallPosition, wallSize) {
         const shape = new CANNON.Box(new CANNON.Vec3(wallSize.x / 2, wallSize.y / 2, wallSize.z / 2));
         const wallBody = new CANNON.Body({ mass: 0 });
@@ -491,15 +543,16 @@ function createBoxBoundary(width, height, depth) {
 }
 
 // 카메라의 z 위치에서 볼 수 있는 뷰의 크기 계산
-function getViewSizeAtDepth(depth) {
+function getViewSize(depth) {
     const fovInRadians = (camera.fov * Math.PI) / 180;
     const height = 2 * Math.tan(fovInRadians / 2) * Math.abs(depth);
     const width = height * camera.aspect;
     return { width, height };
 }
-createBoxBoundary(1, 1, 5);
+createBoundary(1, 1, 5);
 
 document.getElementById('ranDice').addEventListener('click', function() {
+    soundPlay();
     updateScene();
 });
 
@@ -521,13 +574,12 @@ function animate() {
         mesh.position.copy(mesh.body.position);
         mesh.quaternion.copy(mesh.body.quaternion);
     });
-    
     animateMeshes();
     // cannonDebugger.update(); 
-    renderer.render(scene, camera);
+    // renderer.render( scene, camera );
+    composer.render();
 }
 animate();
-
 
 //UI BUTTON------------------------------------------------------------
 const filter = document.getElementById('filter');
@@ -541,22 +593,10 @@ document.getElementById('toggleMode').addEventListener('click', function() {
     const ranDice = document.getElementById('ranDice');
     const saveImg = document.getElementById('saveImg');
     const record = document.getElementById('record');
+    bg.classList.toggle('night-mode');
 
-    bg.classList.toggle('day-mode');
-    if (!bg.classList.contains('day-mode')) {
-        bg.classList.add('night-mode');
-        boundBox.classList.remove('blackText');
-        boundBox.classList.add('whiteText');
-
-        exScroll.style.mixBlendMode = 'screen';
-        ranDice.src = 'sources/ranNight-Icon.svg';
-        filter.src = 'sources/filterNight-Icon.svg';
-        filterBox.style.border = 'solid white 2.5px';
-        filterBox.style.color = 'white';
-        saveImg.src = 'sources/saveImgNight-Icon.svg';
-        record.src = 'sources/recordNight-Icon.svg';
-    } else {
-        bg.classList.remove('night-mode');
+    if (!bg.classList.contains('night-mode')) {
+        bg.classList.add('day-mode');
         boundBox.classList.remove('whiteText');
         boundBox.classList.add('blackText');
 
@@ -567,6 +607,18 @@ document.getElementById('toggleMode').addEventListener('click', function() {
         filterBox.style.color = 'black';
         saveImg.src = 'sources/saveImgDay-Icon.svg';
         record.src = 'sources/recordDay-Icon.svg';
+    } else {
+        bg.classList.remove('day-mode');
+        boundBox.classList.remove('blackText');
+        boundBox.classList.add('whiteText');
+
+        exScroll.style.mixBlendMode = 'screen';
+        ranDice.src = 'sources/ranNight-Icon.svg';
+        filter.src = 'sources/filterNight-Icon.svg';
+        filterBox.style.border = 'solid white 2.5px';
+        filterBox.style.color = 'white';
+        saveImg.src = 'sources/saveImgNight-Icon.svg';
+        record.src = 'sources/recordNight-Icon.svg';
     }
     
     if (dayNight.src.includes('sources/toDay-Icon.svg')) {
@@ -595,6 +647,7 @@ const opacityRange = document.getElementById('3d-opacity');
 opacityRange.addEventListener('input', function() {
     let opacityValue = opacityRange.value / 10;
     threeCanvas.style.opacity = opacityValue;
+    console.log()
     if (opacityValue == 0) {
         threeCanvas.style.display = 'none';
     } else {

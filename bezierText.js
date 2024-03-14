@@ -11,7 +11,7 @@ let ctx = canvas.getContext('2d');
 let bezierCnt;
 let pointPos;
 let allControlPoints = [];
-let seconds = 2;
+let seconds = 3;
 
 const tempoRange = document.getElementById('tempo');
 tempoRange.addEventListener('input', function() {
@@ -47,7 +47,7 @@ function textJustify() {
 
 function onTextInput() {
     let textValue = textInput.value;
-    let textArray = textValue.split('~');
+    let textArray = textValue.split(' ');
     let currentCircleNums = new Set();
 
     // div 초기화
@@ -111,7 +111,7 @@ function getTextAlignValue(circleNum) {
 }
 
 // 초기화: 기본 문장 설정
-textInput.value = "TEXT~TYPE~WITH [⁓]!";
+textInput.value = "영상으로 경험을 이야기합니다.";
 onTextInput(); // 초기 div 생성 및 화면 표시
 
 textInput.addEventListener('keyup', onTextInput);
@@ -585,7 +585,7 @@ function animate() {
 }
 
 animate();
-export { bezierCnt, pointPos, ranColor }
+export { bezierCnt, pointPos, ranColor, ranTextAlign }
 
 
 //마우스 드래그 이벤트---------------------------------------------

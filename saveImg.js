@@ -14,14 +14,10 @@ document.getElementById('saveImg').addEventListener('click', function() {
             let gradient = ctx.createLinearGradient(0, 0, 0, height);
     
             if (element.classList.contains("day-mode")) {
-                gradient.addColorStop(0, "rgb(220, 220, 220)");
-                gradient.addColorStop(0.2, "rgb(255, 255, 255)");
+                ctx.fillStyle = "rgb(255, 255, 255)";
             } else if (element.classList.contains("night-mode")) {
-                gradient.addColorStop(0.8, "rgb(0, 0, 0)");
-                gradient.addColorStop(1, "rgb(55, 55, 55)");
+                ctx.fillStyle = "rgb(0, 0, 0)";
             }
-    
-            ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
         }
         
