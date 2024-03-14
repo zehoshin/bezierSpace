@@ -454,7 +454,7 @@ function animateMeshes() {
         }
         const animation = mesh.animation;
         
-        if ((Math.abs(pointPos - 0.99) < 0.01) && animation.animationPhase === 0) {
+        if (window.innerWidth > 600 && (Math.abs(pointPos - 0.99) < 0.01) && animation.animationPhase === 0) {
             animation.isAnimating = true;
             animation.animationPhase = 1;
             animation.animationStartTime = currentTime;
