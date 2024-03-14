@@ -294,7 +294,7 @@ function addMesh() {
         const lineGeometry = new LineSegmentsGeometry().fromEdgesGeometry(edges);
         const lineMaterial = new LineMaterial({
             color: ranNeon(),
-            linewidth: window.innerWidth <= 600 ? 2 : 4, 
+            linewidth: window.innerWidth <= 600 ? 2 : 3.5, 
         });
 
         const line = new Line2(lineGeometry, lineMaterial);
@@ -517,20 +517,32 @@ function applyRadialForces() {
     });
 }
 
+let boundaryWalls = []; // 현재 경계 벽들을 저장하는 배열
+
+function clearBoundary() {
+    // 기존에 생성된 모든 경계 벽을 제거
+    boundaryWalls.forEach(wall => {
+        world.removeBody(wall); // CANNON.js의 World에서 제거
+    });
+    boundaryWalls = []; // 배열 초기화
+}
+
 function createBoundary(width, height, depth) {
+    clearBoundary(); // 기존 경계 제거
+
     const viewSize = getViewSize(camera.position.z);
     const wallThickness = 0.01;
     const halfWidth = width * viewSize.width / 2;
     const halfHeight = height * viewSize.height / 2;
     const halfDepth = depth / 2;
 
-    // 육면체 벽 생성
     function createWall(wallPosition, wallSize) {
         const shape = new CANNON.Box(new CANNON.Vec3(wallSize.x / 2, wallSize.y / 2, wallSize.z / 2));
         const wallBody = new CANNON.Body({ mass: 0 });
         wallBody.addShape(shape);
         wallBody.position.copy(wallPosition);
         world.addBody(wallBody);
+        boundaryWalls.push(wallBody); // 생성된 벽을 배열에 추가
     }
 
     // up, down
@@ -559,9 +571,15 @@ document.getElementById('ranDice').addEventListener('click', function() {
 });
 
 let lastBezierCnt = -1;
+const camZpos = document.getElementById('camZpos');
 
 function animate() {
     requestAnimationFrame(animate);
+    camZpos.addEventListener('input', function() {
+        camera.position.z = camZpos.value;
+        createBoundary(1, 1, 5);
+    });
+    
     applyRadialForces();
     if (bezierCnt !== lastBezierCnt) {
         updateScene();
@@ -656,3 +674,4 @@ opacityRange.addEventListener('input', function() {
         threeCanvas.style.display = 'block';
     }
 });
+
