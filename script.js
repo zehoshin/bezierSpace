@@ -6,9 +6,10 @@ import { LineSegmentsGeometry } from "./lines/LineSegmentsGeometry.js";
 
 import { EffectComposer } from './postprocessing/EffectComposer.js';
 import { RenderPass } from './postprocessing/RenderPass.js';
+import { ShaderPass } from './postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from './postprocessing/UnrealBloomPass.js';
 import { OutputPass } from './postprocessing/OutputPass.js';
-
+import { FXAAShader } from './shaders/FXAAShader.js';
 
 import { bezierCnt, pointPos, ranColor, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
@@ -43,7 +44,7 @@ const threeCanvas = document.getElementById('threeCanvas');
 
 threeCanvas.appendChild( renderer.domElement );
 
-let composer
+let composer, fxaaPass;
 
 function init() {
     const renderScene = new RenderPass( scene, camera );
@@ -55,10 +56,17 @@ function init() {
 
     const outputPass = new OutputPass();
 
+    fxaaPass = new ShaderPass( FXAAShader );
+    const pixelRatio = renderer.getPixelRatio();
+
+    fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
+    fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
+
     composer = new EffectComposer( renderer );
     composer.addPass( renderScene );
     composer.addPass( bloomPass );
     composer.addPass( outputPass );
+    composer.addPass( fxaaPass );
 }
 
 init();
