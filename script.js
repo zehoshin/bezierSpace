@@ -269,7 +269,11 @@ function addMesh() {
     if (materials[materialIndex] === 'wireFrame') {
         segments = 10;
     } else {
-        segments = 60; // 다른 재료일 경우 기본값으로 재설정
+        if ( window.innerWidth > 600 ) {
+            segments = 60;
+        } else {
+            segments = 30;
+        }
     }
     
     const geometries = [
@@ -458,7 +462,6 @@ function animateMeshes() {
             animation.isAnimating = true;
             animation.animationPhase = 1;
             animation.animationStartTime = currentTime;
-
         }
 
         if (animation.isAnimating) {
