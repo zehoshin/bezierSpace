@@ -16,7 +16,7 @@ document.getElementById('saveImg').addEventListener('click', function() {
             if (element.classList.contains("day-mode")) {
                 ctx.fillStyle = "rgb(255, 255, 255)";
             } else if (element.classList.contains("night-mode")) {
-                ctx.fillStyle = "rgb(0, 0, 0)";
+                ctx.fillStyle = "rgb(20, 20, 20)";
             }
             ctx.fillRect(0, 0, width, height);
         }

@@ -13,7 +13,7 @@ import { bezierCnt, pointPos, ranColor, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
 
 const scene = new THREE.Scene();
-// scene.background = new THREE.Color( 0xffffff );
+// scene.background = new THREE.Color( 0xffffff ); 
 
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.z = 10;
@@ -50,7 +50,7 @@ function init() {
     const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
     bloomPass.threshold = 0.1;
     bloomPass.strength = 0.14;
-    bloomPass.radius = 1.0;
+    bloomPass.radius = 1.5;
 
     const outputPass = new OutputPass();
 
@@ -68,8 +68,8 @@ world.gravity.set(0, 0, 0);
 world.broadphase = new CANNON.SAPBroadphase(world);
 world.solver = new CANNON.GSSolver();
 
-world.solver.iterations = 10;
-world.solver.tolerance = 0.001;
+world.solver.iterations = 5;
+world.solver.tolerance = 0.1;
 
 let cannonDebugger = new CannonDebugger( scene, world );
 
@@ -265,6 +265,7 @@ function addMesh() {
     let ranSizeZ = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2 
     let ranSizeH = Math.random() * 0.09 + 0.01; // 0.01 ~ 0.10 
     let ranSizeW = Math.random() * 0.4 + 0.2; // 0.2 ~ 0.6
+    let ranSizeH2 = window.innerWidth <= 600 ? Math.random() * 0.3 + 0.3 : Math.random() * 0.7 + 0.5; 
 
     if (materials[materialIndex] === 'wireFrame') {
         segments = 10;
@@ -280,7 +281,7 @@ function addMesh() {
         new THREE.BoxGeometry(ranSizeX * scaleFactor, ranSizeY * scaleFactor, ranSizeZ * scaleFactor), // 0 큐브
         new THREE.SphereGeometry(0.75 * scaleFactor, segments, segments), // 1 구
         new THREE.CylinderGeometry(ranSizeX * scaleFactor, ranSizeX * scaleFactor, ranSizeH, segments), // 2 원판
-        new THREE.CylinderGeometry(ranSizeW * scaleFactor, ranSizeW * scaleFactor, ranSizeX, segments), // 3 원기둥
+        new THREE.CylinderGeometry(ranSizeW * scaleFactor, ranSizeW * scaleFactor, ranSizeH2, segments), // 3 원기둥
     ];
 
     const geometryIndex = Math.floor(Math.random() * geometries.length);
@@ -335,7 +336,7 @@ function addMesh() {
     const shape = getShapeForGeometry(geometry, ranScale);
     
     const body = new CANNON.Body({
-        mass: 10, 
+        mass: 1, 
         material: new CANNON.Material({friction: 0.1, restitution: 0.9})
     });
     body.addShape(shape);
@@ -437,16 +438,11 @@ function cubicBezier(t, p0, p1, p2, p3) {
 function animateMeshes() {
     const currentTime = (new Date()).getTime() / 500;
 
-    // let animationStarted = false;
-    // if ((Math.abs(pointPos - 0.99) < 0.01) && !animationStarted) {
-    //     animationStarted = true;
-    //     setTimeout(function() {
-    //         soundPlay();
-    //         updateScene();
-    //         ranTextAlign();
-    //         animationStarted = false;
-    //     }, 10);
-    // }
+    if ((Math.abs(pointPos - 0.99) < 0.01)) {
+            soundPlay();
+            updateScene();
+            ranTextAlign();
+    }
 
     meshes.forEach(mesh => {
         if (!mesh.animation) {
@@ -517,18 +513,28 @@ function applyRadialForces() {
     });
 }
 
-let boundaryWalls = []; // 현재 경계 벽들을 저장하는 배열
+let boundaryWalls = [];
 
-function clearBoundary() {
-    // 기존에 생성된 모든 경계 벽을 제거
-    boundaryWalls.forEach(wall => {
-        world.removeBody(wall); // CANNON.js의 World에서 제거
-    });
-    boundaryWalls = []; // 배열 초기화
+function createOrUpdateWall(index, wallPosition, wallSize) {
+    let shape = new CANNON.Box(new CANNON.Vec3(wallSize.x / 2, wallSize.y / 2, wallSize.z / 2));
+    let wallBody;
+
+    if (index < boundaryWalls.length) {
+        // 기존 벽 업데이트
+        wallBody = boundaryWalls[index];
+        wallBody.position.copy(wallPosition);
+        wallBody.shapes[0] = shape;
+    } else {
+        // 새 벽 생성
+        wallBody = new CANNON.Body({ mass: 0 });
+        wallBody.addShape(shape);
+        wallBody.position.copy(wallPosition);
+        world.addBody(wallBody);
+        boundaryWalls.push(wallBody);
+    }
 }
 
 function createBoundary(width, height, depth) {
-    clearBoundary(); // 기존 경계 제거
 
     const viewSize = getViewSize(camera.position.z);
     const wallThickness = 0.01;
@@ -536,24 +542,13 @@ function createBoundary(width, height, depth) {
     const halfHeight = height * viewSize.height / 2;
     const halfDepth = depth / 2;
 
-    function createWall(wallPosition, wallSize) {
-        const shape = new CANNON.Box(new CANNON.Vec3(wallSize.x / 2, wallSize.y / 2, wallSize.z / 2));
-        const wallBody = new CANNON.Body({ mass: 0 });
-        wallBody.addShape(shape);
-        wallBody.position.copy(wallPosition);
-        world.addBody(wallBody);
-        boundaryWalls.push(wallBody); // 생성된 벽을 배열에 추가
-    }
-
-    // up, down
-    createWall(new CANNON.Vec3(0, halfHeight, 0 + zPos), new CANNON.Vec3(width * viewSize.width, wallThickness, depth));
-    createWall(new CANNON.Vec3(0, -halfHeight, 0 + zPos), new CANNON.Vec3(width * viewSize.width, wallThickness, depth));
-    // left, right
-    createWall(new CANNON.Vec3(-halfWidth, 0, 0 + zPos), new CANNON.Vec3(wallThickness, height * viewSize.height, depth));
-    createWall(new CANNON.Vec3(halfWidth, 0, 0 + zPos), new CANNON.Vec3(wallThickness, height * viewSize.height, depth));
-    // front, back
-    createWall(new CANNON.Vec3(0, 0, halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
-    createWall(new CANNON.Vec3(0, 0, -halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
+    // 벽 생성 또는 업데이트
+    createOrUpdateWall(0, new CANNON.Vec3(0, halfHeight, 0 + zPos), new CANNON.Vec3(width * viewSize.width, wallThickness, depth));
+    createOrUpdateWall(1, new CANNON.Vec3(0, -halfHeight, 0 + zPos), new CANNON.Vec3(width * viewSize.width, wallThickness, depth));
+    createOrUpdateWall(2, new CANNON.Vec3(-halfWidth, 0, 0 + zPos), new CANNON.Vec3(wallThickness, height * viewSize.height, depth));
+    createOrUpdateWall(3, new CANNON.Vec3(halfWidth, 0, 0 + zPos), new CANNON.Vec3(wallThickness, height * viewSize.height, depth));
+    createOrUpdateWall(4, new CANNON.Vec3(0, 0, halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
+    createOrUpdateWall(5, new CANNON.Vec3(0, 0, -halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
 }
 
 // 카메라의 z 위치에서 볼 수 있는 뷰의 크기 계산
@@ -575,8 +570,9 @@ const camZpos = document.getElementById('camZpos');
 
 function animate() {
     requestAnimationFrame(animate);
+
     camZpos.addEventListener('input', function() {
-        camera.position.z = camZpos.value;
+        camera.position.z = camZpos.value * 5;
         createBoundary(1, 1, 5);
     });
     

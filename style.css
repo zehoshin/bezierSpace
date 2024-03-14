@@ -113,11 +113,11 @@ select {
 }
 
 .day-mode {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
 }
 
 .night-mode {
-    background-color: black;
+    background-color: rgb(20, 20, 20);
 }
 
 .whiteText {
