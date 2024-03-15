@@ -7,8 +7,7 @@
 	.st1{fill:#FFFFFF;}
 	.st2{fill:none;stroke:#000000;stroke-width:2.25;stroke-miterlimit:10;}
 	.st3{fill:none;stroke:#000000;stroke-width:5.2941;stroke-miterlimit:10;}
-	.st4{fill:none;stroke:#000000;stroke-width:3;stroke-miterlimit:10;}
 </style>
 <circle class="st1" cx="30" cy="30" r="30"/>
-<line class="st3" x1="17.55" y1="30" x2="42.45" y2="30"/>
+<line class="st3" x1="19.23" y1="30" x2="40.77" y2="30"/>
 </svg>
