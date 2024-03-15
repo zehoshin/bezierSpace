@@ -413,7 +413,10 @@ body {
 }
 
 #minusCnt {
-    line-height: 27px;
+    background-image: url(./sources/minusCnt.svg);
+}
+#plusCnt {
+    background-image: url(./sources/PlusCnt.svg);
 }
 
 #num {
