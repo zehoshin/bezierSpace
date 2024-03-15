@@ -1,27 +1,4 @@
 @media screen and (max-width: 600px) {
-    .btnIcon {
-        width: 45px;
-        left: 20px;
-    }   
-    #toggleMode {
-        top: 25px;
-    }
-    #ranDice {
-        top: 80px;
-    }
-    #filter {
-        top: 135px;
-    }
-    #filterBox {
-        top: 135px;
-        left: 80px;
-    }
-    #saveImg {
-        top: 190px;
-    }
-    #record {
-        top: 245px;
-    }
     .textDiv {
         font-weight: 900;
         font-size: 36pt;
@@ -43,34 +20,67 @@
         right: 20px;
     }
     #textInput {
+        width: 320px;
         bottom: 50px;
+    }
+    #controlPanel {
+        width: 360px;
+        height: 210px;
+        flex-wrap: wrap;
+        font-size: 14px;
+        border-radius: 0px 0px 10px 10px;
+        padding: 10px 10px 10px 10px;
+        justify-content: space-evenly;
+        align-items: stretch;
+    }
+    #panelAll {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        top: -210px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    #line2 {
+        display: none;
+    }
+    #firstToggle {
+        margin-top: 0px;
+    }
+    .line {
+        margin: 0px 15px 0px 15px;
+    }
+    #toggleBox {
+        margin: 0px 15px 0px 15px;
+    }
+    #countBox {
+        margin: 0px 15px 0px 15px;
+    }
+    #paramBox {
+        margin: 0px 15px 0px 15px;
+    }
+    #num {
+        width: 60px;
+    }
+
+    @keyframes panelMotionIn {
+        0% {
+            top: -210px;
+        }
+        100% {
+            top: -2px;
+        }
+    }
+    @keyframes panelMotionOut {
+        0% {
+            top: -2px;
+        }
+        100% {
+            top: -210px;
+        }
     }
 }
 @media screen and (min-width: 600px) {
-    .btnIcon {
-        width: 55px;
-        top: 25px;
-        left: 25px;
-    }    
-    #toggleMode {
-        top: 25px;
-    }
-    #ranDice {
-        top: 90px;
-    }
-    #filter {
-        top: 155px;
-    }
-    #filterBox {
-        top: 155px;
-        left: 95px;
-    }
-    #saveImg {
-        top: 220px;
-    }
-    #record {
-        top: 285px;
-    }
     .textDiv {
         font-weight: 700;
         font-size: 100pt;
@@ -90,10 +100,45 @@
     }
     #exScroll {
         width: 20px;
-        right: 30px;
+        right: 20px;
     }
     #textInput {
+        width: 350px;
         bottom: 80px;
+    }
+    #controlPanel {
+        width: 220px;
+        height: 520px;
+        font-size: 17px;
+        padding: 10px 20px 10px 20px;
+        justify-content: space-around;
+    }
+    #panelAll {
+        top: -520px;
+        left: 20px;    
+    }
+    #firstToggle {
+        margin-top: 20px;
+    }
+    #num {
+        width: 95px;
+    }
+
+    @keyframes panelMotionIn {
+        0% {
+            top: -520px;
+        }
+        100% {
+            top: -22px;
+        }
+    }
+    @keyframes panelMotionOut {
+        0% {
+            top: -22px;
+        }
+        100% {
+            top: -520px;
+        }
     }
 }
 
@@ -104,12 +149,6 @@
     padding: 0;
     box-sizing: border-box;
     overflow: hidden;
-}
-
-input,
-textarea,
-select {
-    font-size: 16px;
 }
 
 .day-mode {
@@ -156,38 +195,20 @@ body {
     opacity: 0.5;
 }
 
-.btnIcon {
-    border-radius: 100%;
-    position: absolute;
-    cursor: pointer;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-
-#record {
-    display: none;
-}
-
-#filterBox {
-    position: absolute;
-    padding: 12px 15px 15px 15px;
-    display: none;
-    flex-direction: column;
-    align-items: flex-start;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: solid black 2.5px;
-    border-radius: 20px;
-    font-weight: 700;
-}
-#tempo {
-    margin-bottom: 10px;
-}
-
 #textInput {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    background-color: #111111;
+    color: white;
+    border: 0;
+    border-radius: 6px;
+    font-family: "Noto Sans KR", sans-serif;
+    font-size: 20px;
+    font-weight: 450;
+    height: 40px;
+    padding: 10px 14px 12px 14px;
+
 }
 
 #boundBox {
@@ -252,31 +273,159 @@ body {
     z-index: -1;
 }
 
-#wrapper {
-    border: 2px black solid;
-    width: 120px;
-    padding: 10px;
-    display: flex;
-    border-radius: 15px;
+.panelMotionIn {
+    animation: panelMotionIn 1s cubic-bezier(.15,.8,.6,1) forwards;
+}
+
+
+
+.panelMotionOut {
+    animation: panelMotionOut 1s cubic-bezier(.15,.8,.6,1) forwards;
+}
+
+#panelAll {
     position: absolute;
-    z-index: 5;
-    left: 25px;
-    bottom: 100px;
+    z-index: 10;
+}
+
+#panelPicker {
+    width: 220px;
+    height: 40px;
+    font-size: 19px;
+    background-color: #111111;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0px 15px 4.5px 15px;
+    border-radius: 0px 0px 10px 10px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#controlPanel {
+    display: flex;
+    flex-direction: column;
+    font-weight: 700;
+    border: 2px #111111 solid;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.05)
+}
+
+#toggleBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.textFlex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0px 0px 0px;
+}
+
+.toggleSwitch {
+    width: 40px;
+    height: 20px;
+    display: block;
+    position: relative;
+    border-radius: 20px;
+    background-color: #fff;
+    cursor: pointer;
+    margin-top: 1px;
+  }
+  
+.toggleSwitch .toggleButton {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 50%;
+    left: 3px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: #111111;
+}
+
+[type="checkbox"]:checked ~ .toggleSwitch {
+    background: #111111;
+}
+
+[type="checkbox"]:checked ~ .toggleSwitch .toggleButton {
+    left: calc(100% - 19px);
+    background: #fff;
+}
+
+.toggleSwitch, .toggleButton {
+    transition: all 0.2s ease-in;
+}
+
+#saveImg {
+    width: 40px;
+    height: 20px;
+    display: block;
+    position: relative;
+    border-radius: 20px;
+    border: 0;
+    background-color: #fff;
+    background-image: url(./sources/saveImg.svg);
+    cursor: pointer;
+    margin-top: 1px;
+}
+
+.line {
+    height: 1.5px;
+    background: black;
+    opacity: 0.4;
+}
+
+.paramWithText {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.rangeInput{
+    width: 100%;
+    accent-color: #ffffff;
+    cursor: pointer;
+}
+
+#wrapper {
+    margin-top: 7px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .plusminus {
-    height: 100%;
-    width: 30%;
-    border: none;
-    background: rgba(0, 0, 0, 0);
-    font-size: 40px;
+    border: 2px rgb(255, 255, 255) solid;
+    background: #ffffff;
+    border-radius: 100%;
+    height: 34px;
+    width: 34px;
+    font-size: 28px;
+    font-weight: 200;
     color: black;
+    cursor: pointer;
+}
+
+#minusCnt {
+    line-height: 27px;
 }
 
 #num {
-    height: 100%;
-    width: 39%;
-    border: none;
-    font-size: 30px;
+    border: 2px #111111 solid;
+    background-color: #111111;
+    border-radius: 30px;
+    height: 36px;
+    font-size: 20px;
     text-align: center;  
+    color: white;
+}
+
+#arrow {
+    width: 20px;
 }

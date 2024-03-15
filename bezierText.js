@@ -5,7 +5,7 @@ import { Bezier } from "./bezier.js";
 let textInput = document.getElementById('textInput');
 let container = document.getElementById('container');
 let canvas = document.getElementById('bezierCanvas');
-let ranDice = document.getElementById('ranDice');
+// let ranDice = document.getElementById('ranDice');
 
 let ctx = canvas.getContext('2d');
 let bezierCnt;
@@ -22,7 +22,7 @@ tempoRange.addEventListener('input', function() {
     seconds = tempoValue;
     }
     const tempoText = document.getElementById('tempoText')
-    tempoText.innerHTML = 'TEMPO = ' + parseFloat(tempoValue).toFixed(1) + 's';
+    tempoText.innerHTML = parseFloat(tempoValue).toFixed(1) + 'sec';
     updateSpeedForAllCurves();
 });
 
@@ -115,7 +115,7 @@ textInput.value = "영상으로 경험을 이야기합니다.";
 onTextInput(); // 초기 div 생성 및 화면 표시
 
 textInput.addEventListener('keyup', onTextInput);
-ranDice.addEventListener('click', onTextInput);
+// ranDice.addEventListener('click', onTextInput);
 
 function ranTextAlign() {
     document.querySelectorAll('.textDiv').forEach((div, index) => {
@@ -128,7 +128,7 @@ function ranTextAlign() {
     genBezierCurve();
 }
 
-ranDice.addEventListener('click', ranTextAlign);
+// ranDice.addEventListener('click', ranTextAlign);
 
 //스크롤바-------------------------------------------------------------
 const exScroll = document.getElementById('exScroll');
@@ -246,20 +246,64 @@ function ranColor() {
     return code + randomstring;
 }
 
+function ranNeon() {
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = Math.random() * (100 - 70) + 70;
+    const lightness = Math.random() * (80 - 50) + 50;
+
+    function hslToRgb(h, s, l) {
+        s /= 100;
+        l /= 100;
+        let c = (1 - Math.abs(2 * l - 1)) * s,
+            x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+            m = l - c/2,
+            r = 0,
+            g = 0,
+            b = 0;
+        if (0 <= h && h < 60) {
+            r = c; g = x; b = 0;
+        } else if (60 <= h && h < 120) {
+            r = x; g = c; b = 0;
+        } else if (120 <= h && h < 180) {
+            r = 0; g = c; b = x;
+        } else if (180 <= h && h < 240) {
+            r = 0; g = x; b = c;
+        } else if (240 <= h && h < 300) {
+            r = x; g = 0; b = c;
+        } else if (300 <= h && h < 360) {
+            r = c; g = 0; b = x;
+        }
+        r = Math.round((r + m) * 255);
+        g = Math.round((g + m) * 255);
+        b = Math.round((b + m) * 255);
+        return {r, g, b};
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map(x => {
+            const hex = x.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        }).join('');
+    }
+
+    const {r, g, b} = hslToRgb(hue, saturation, lightness);
+    return rgbToHex(r, g, b);
+}
+
 function ranLineWidth() {
     if (window.innerWidth <= 600) {
         return Math.floor(Math.random() * 5) + 5; // 5~10
     } else {
-        return Math.floor(Math.random() * 10) + 5; // 5~15
+        return Math.floor(Math.random() * 20) + 10; // 10~30
     }
 }
 
 function ranRadius() {
     let lineWidth = ranLineWidth();
     if (window.innerWidth <= 600) {
-        return lineWidth + 2 + Math.floor(Math.random() * 10); // 7~22
+        return lineWidth + 2 + Math.floor(Math.random() * 10); // (5 + 2)~(10 + 12)
     } else {
-        return lineWidth + 5 + Math.floor(Math.random() * 10); // 10~30
+        return lineWidth + 5; // (10 + 5)~(30 + 5)
     }
 }
 
@@ -439,7 +483,7 @@ function genBezierCurve() {
                 relativePositions: relativePositions,
                 points: controlPoints,
                 shape: ranShape(),
-                color: ranColor(),
+                color: ranNeon(),
                 lineWidth: ranLineWidth(),
                 lineStyle: Math.random() < 0.4 ? 'dashed' : 'solid',
                 radius: ranRadius(),
@@ -585,7 +629,7 @@ function animate() {
 }
 
 animate();
-export { bezierCnt, pointPos, ranColor, ranTextAlign }
+export { bezierCnt, pointPos, ranNeon, ranTextAlign }
 
 
 //마우스 드래그 이벤트---------------------------------------------

@@ -9,7 +9,7 @@ import { RenderPass } from './postprocessing/RenderPass.js';
 import { UnrealBloomPass } from './postprocessing/UnrealBloomPass.js';
 import { OutputPass } from './postprocessing/OutputPass.js';
 
-import { bezierCnt, pointPos, ranColor, ranTextAlign } from './bezierText.js';
+import { bezierCnt, pointPos, ranNeon, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
 
 const scene = new THREE.Scene();
@@ -44,6 +44,8 @@ threeCanvas.appendChild( renderer.domElement );
 
 let composer
 
+init();
+
 function init() {
     const renderScene = new RenderPass( scene, camera );
 
@@ -58,9 +60,21 @@ function init() {
     composer.addPass( renderScene );
     composer.addPass( bloomPass );
     composer.addPass( outputPass );
+    window.addEventListener( 'resize', onWindowResize );
 }
 
-init();
+function onWindowResize() {
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( width, height );
+    composer.setSize( width, height );
+
+}
 
 // cannon-es.js 물리 세계 생성
 const world = new CANNON.World();
@@ -207,50 +221,6 @@ function getRandomPosition(radius) {
         distanceSquared = position.x ** 2 + position.y ** 2 + position.z ** 2;
     } while (distanceSquared > radius ** 2);
     return position;
-}
-
-function ranNeon() {
-    const hue = Math.floor(Math.random() * 360);
-    const saturation = Math.random() * (100 - 70) + 70;
-    const lightness = Math.random() * (80 - 50) + 50;
-
-    function hslToRgb(h, s, l) {
-        s /= 100;
-        l /= 100;
-        let c = (1 - Math.abs(2 * l - 1)) * s,
-            x = c * (1 - Math.abs((h / 60) % 2 - 1)),
-            m = l - c/2,
-            r = 0,
-            g = 0,
-            b = 0;
-        if (0 <= h && h < 60) {
-            r = c; g = x; b = 0;
-        } else if (60 <= h && h < 120) {
-            r = x; g = c; b = 0;
-        } else if (120 <= h && h < 180) {
-            r = 0; g = c; b = x;
-        } else if (180 <= h && h < 240) {
-            r = 0; g = x; b = c;
-        } else if (240 <= h && h < 300) {
-            r = x; g = 0; b = c;
-        } else if (300 <= h && h < 360) {
-            r = c; g = 0; b = x;
-        }
-        r = Math.round((r + m) * 255);
-        g = Math.round((g + m) * 255);
-        b = Math.round((b + m) * 255);
-        return {r, g, b};
-    }
-
-    function rgbToHex(r, g, b) {
-        return "#" + [r, g, b].map(x => {
-            const hex = x.toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
-        }).join('');
-    }
-
-    const {r, g, b} = hslToRgb(hue, saturation, lightness);
-    return rgbToHex(r, g, b);
 }
 
 let segments;
@@ -435,14 +405,17 @@ function cubicBezier(t, p0, p1, p2, p3) {
     return ((A * t + B) * t + C) * t + D;
 }
 
+const random = document.getElementById('random');
+
 function animateMeshes() {
     const currentTime = (new Date()).getTime() / 500;
 
-    if ((Math.abs(pointPos - 0.99) < 0.01)) {
-            soundPlay();
-            updateScene();
-            ranTextAlign();
+    if (random.checked && (Math.abs(pointPos - 0.99) < 0.01)) {
+        soundPlay();
+        updateScene();
+        ranTextAlign();
     }
+
 
     meshes.forEach(mesh => {
         if (!mesh.animation) {
@@ -560,10 +533,10 @@ function getViewSize(depth) {
 }
 createBoundary(1, 1, 5);
 
-document.getElementById('ranDice').addEventListener('click', function() {
-    soundPlay();
-    updateScene();
-});
+// document.getElementById('ranDice').addEventListener('click', function() {
+//     soundPlay();
+//     updateScene();
+// });
 
 let lastBezierCnt = -1;
 const camZpos = document.getElementById('camZpos');
@@ -598,76 +571,125 @@ function animate() {
 animate();
 
 //UI BUTTON------------------------------------------------------------
-const filter = document.getElementById('filter');
-const filterBox = document.getElementById('filterBox');
+const boundBox = document.getElementById('boundBox');
+const toggle = document.getElementById('toggle');
+const toggleText = document.getElementById('toggleText');
+const bg = document.getElementById('bg');
+const textInput = document.getElementById('textInput');
+const controlPanel = document.getElementById('controlPanel');
+const panelPicker = document.getElementById('panelPicker');
+const line = document.querySelectorAll('.line');
+const arrow = document.getElementById('arrow');
 
-document.getElementById('toggleMode').addEventListener('click', function() {
-    const bg = document.getElementById('bg');
-    const boundBox = document.getElementById('boundBox');
-    const exScroll = document.getElementById('exScroll');
-    const dayNight = document.getElementById('toggleMode');
-    const ranDice = document.getElementById('ranDice');
-    const saveImg = document.getElementById('saveImg');
-    const record = document.getElementById('record');
-    bg.classList.toggle('night-mode');
-
-    if (!bg.classList.contains('night-mode')) {
-        bg.classList.add('day-mode');
-        boundBox.classList.remove('whiteText');
-        boundBox.classList.add('blackText');
-
-        exScroll.style.mixBlendMode = 'multiply';
-        ranDice.src = 'sources/ranDay-Icon.svg';
-        filter.src = 'sources/filterDay-Icon.svg';
-        filterBox.style.border = 'solid black 2.6px';
-        filterBox.style.color = 'black';
-        saveImg.src = 'sources/saveImgDay-Icon.svg';
-        record.src = 'sources/recordDay-Icon.svg';
-    } else {
+toggle.addEventListener('change', function() {
+    if (this.checked) {
+        toggleText.innerHTML = 'NIGHT MODE';
+        bg.classList.add('night-mode');
         bg.classList.remove('day-mode');
         boundBox.classList.remove('blackText');
         boundBox.classList.add('whiteText');
-
         exScroll.style.mixBlendMode = 'screen';
-        ranDice.src = 'sources/ranNight-Icon.svg';
-        filter.src = 'sources/filterNight-Icon.svg';
-        filterBox.style.border = 'solid white 2.5px';
-        filterBox.style.color = 'white';
-        saveImg.src = 'sources/saveImgNight-Icon.svg';
-        record.src = 'sources/recordNight-Icon.svg';
-    }
-    
-    if (dayNight.src.includes('sources/toDay-Icon.svg')) {
-        dayNight.src = 'sources/toNight-Icon.svg';
+        textInput.style.backgroundColor = 'white';
+        textInput.style.color = 'black';
+        controlPanel.style.color = 'white';
+        controlPanel.style.fontWeight = '500';
+        controlPanel.style.border = '1px #ffffff solid';
+        controlPanel.style.backgroundColor ='rgba(255, 255, 255, 0.1)';
+        line.forEach(el => el.style.background = 'white');
+        panelPicker.style.backgroundColor = 'white';
+        panelPicker.style.color = 'black';
+        panelPicker.style.fontWeight = '700';
+        arrow.src = 'sources/arrowBK.svg';
     } else {
-        dayNight.src = 'sources/toDay-Icon.svg';
-    }   
+        toggleText.innerHTML = 'DAY MODE';
+        bg.classList.add('day-mode');
+        bg.classList.remove('night-mode');
+        boundBox.classList.remove('whiteText');
+        boundBox.classList.add('blackText');
+        exScroll.style.mixBlendMode = 'multiply';
+        textInput.style.backgroundColor = 'black';
+        textInput.style.color = 'white';
+        controlPanel.style.color = 'black';
+        controlPanel.style.fontWeight = '700';
+        controlPanel.style.border = '2px #111111 solid';
+        controlPanel.style.backgroundColor ='rgba(0, 0, 0, 0.05)';
+        line.forEach(el => el.style.background = 'black');
+        panelPicker.style.backgroundColor = 'black';
+        panelPicker.style.color = 'white';
+        panelPicker.style.fontWeight = '500';
+        arrow.src = 'sources/arrowWT.svg';
+    }
 });
 
-filter.addEventListener('click', function() {
-    if (filterBox.style.display == 'flex') {
-        filterBox.style.display = 'none';
+const randomText = document.getElementById('randomText');
+
+random.addEventListener('change', function() {
+    if (this.checked) {
+        randomText.innerHTML = 'RANDOM ON';
     } else {
-        filterBox.style.display = 'flex';
+        randomText.innerHTML = 'RANDOM OFF';
     }
 });
 
-document.addEventListener('click', function(event) {
-    if (event.target !== filter && !filterBox.contains(event.target)) {
-        filterBox.style.display = 'none';
-    }
-});
 
-const opacityRange = document.getElementById('3d-opacity');
+const threeOpacity = document.getElementById('threeOpacity');
 
-opacityRange.addEventListener('input', function() {
-    let opacityValue = opacityRange.value / 10;
+threeOpacity.addEventListener('input', function() {
+    let opacityValue = threeOpacity.value / 10;
     threeCanvas.style.opacity = opacityValue;
-    console.log()
+
+    const threeOpacityText = document.getElementById('threeOpacityText')
+    threeOpacityText.innerHTML = (opacityValue * 100) + '%';
+    
     if (opacityValue == 0) {
         threeCanvas.style.display = 'none';
     } else {
         threeCanvas.style.display = 'block';
     }
 });
+
+const textOpacity = document.getElementById('textOpacity');
+const bezierCanvas = document.getElementById('bezierCanvas')
+
+textOpacity.addEventListener('input', function() {
+    let opacityValue = textOpacity.value / 10;
+    bezierCanvas.style.opacity = opacityValue;
+    boundBox.style.opacity = opacityValue;
+    textInput.style.opacity = opacityValue;
+
+    const textOpacityText = document.getElementById('textOpacityText')
+    textOpacityText.innerHTML = (opacityValue * 100) + '%';
+    
+    if (opacityValue == 0) {
+        bezierCanvas.style.display = 'none';
+    } else {
+        bezierCanvas.style.display = 'block';
+    }
+});
+
+let panelAnimation = true;
+const panelAll = document.getElementById('panelAll');
+
+panelPicker.addEventListener('click', function() {
+    if (panelAnimation === true) {
+        panelAll.classList.add('panelMotionIn');
+        setTimeout(() => {
+            panelAll.classList.remove('panelMotionIn');
+        }, 1000);
+        panelAll.style.top = window.innerWidth <= 600 ? '-2px' : '-22px';
+        arrow.style.transform = 'rotate(180deg)';
+
+        panelAnimation = false;
+    } else {
+        panelAll.classList.add('panelMotionOut');
+        setTimeout(() => {
+            panelAll.classList.remove('panelMotionOut');
+        }, 1000);
+        panelAll.style.top = window.innerWidth <= 600 ? '-210px' : '-520px';
+        arrow.style.transform = 'rotate(0deg)';
+
+        panelAnimation = true;
+    }
+})
+
 

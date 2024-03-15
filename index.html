@@ -18,32 +18,78 @@
         <canvas id="bezierCanvas" width="1920" height="1080"></canvas>
     </div>
 <div id="videoNone">
-    <img src="sources/toNight-Icon.svg" id="toggleMode" class="btnIcon">
-    <img src="sources/ranDay-Icon.svg" id="ranDice" class="btnIcon">
-    <img src="sources/filterDay-Icon.svg" id="filter" class="btnIcon">
-    <img src="sources/saveImgDay-Icon.svg" id="saveImg" class="btnIcon">
-    <img src="sources/recordDay-Icon.svg" id="record" class="btnIcon">
-
-    <div id="filterBox" style="color: black;">
-        <label for="tempo" id="tempoText">TEMPO = 3.0s</label>
-        <input type="range" id="tempo" name="tempo" min="1" max="5" step ="0.5" value="3"/>
-        <label for="3d-opacity">3D OPACITY</label>
-        <input type="range" id="3d-opacity" name="3d-opacity" min="0" max="10" value="9"/>
-        <label for="camZpos">카메라 위치</label>
-        <input type="range" id="camZpos" name="camZpos" min="1" max="6" value="2"/>
+    <div id="panelAll">
+    <div id="controlPanel">
+        <div id="toggleBox">
+            <div class="textFlex" id="firstToggle">
+                <div id="toggleText">DAY MODE</div>
+                <input type="checkbox" id="toggle" hidden> 
+                <label for="toggle" class="toggleSwitch">
+                    <span class="toggleButton"></span>
+                </label>
+            </div>
+            <div class="textFlex">
+                <div id="randomText">RANDOM ON</div>
+                <input type="checkbox" id="random" checked hidden> 
+                <label for="random" class="toggleSwitch">
+                    <span class="toggleButton"></span>
+                </label>
+            </div>
+            <div class="textFlex">
+                <div>SCREENSHOT</div>
+                <input type="button" id="saveImg"> 
+            </div>
+        </div>
+        <div class="line"></div>
+        <div id="countBox">
+            <div>3D COUNTS</div>
+            <div id="wrapper">
+                <button class="plusminus" id="minusCnt">-O-</button>
+                <div id="num">8</div>
+                <button class="plusminus" id="plusCnt">+</button>
+            </div>
+        </div>
+        <div class="line" id="line2"></div>
+        <div id="paramBox">
+            <div class="paramWithText">
+                <div class="textFlex" style="margin: 0px;">
+                    <div>TEMPO</div>
+                    <div id="tempoText">3.0sec</div>
+                </div>
+                <input class="rangeInput" id="tempo" max="5" min="1" step="0.5" type="range" value="3" />            
+            </div>
+            <div class="paramWithText">
+                <div class="textFlex">
+                    <div>TEXT OPACITY</div>
+                    <div id="textOpacityText">100%</div>
+                </div>
+                <input class="rangeInput" id="textOpacity" max="10" min="0" step="1" type="range" value="10" />            
+            </div>
+            <div class="paramWithText">
+                <div class="textFlex">
+                    <div>3D OPACITY</div>
+                    <div id="threeOpacityText">90%</div>
+                </div>
+                <input class="rangeInput" id="threeOpacity" max="10" min="0" step="1" type="range" value="9"/>            
+            </div>
+            <div class="paramWithText">
+                <div class="textFlex">
+                    <div>CAMERA POSITION</div>
+                </div>
+                <input class="rangeInput" id="camZpos" max="6" min="1" step="1" type="range" value="2"/>            
+            </div>
+        </div>
+    </div>
+    <div id="panelPicker">
+        <div>CONTROL PANEL</div>
+        <img src="./sources/arrowWT.svg" id="arrow" class="arrow"> 
+    </div>
     </div>
 
-    <div id="wrapper">
-        <button class="plusminus" id="minusCnt">-</button>
-        <div id="num">8</div>
-        <button class="plusminus" id="plusCnt">+</button>
-    </div>
-
-    <input type="text" id="textInput" placeholder="영상으로 경험을 이야기합니다." oninput="this.value = this.value.toUpperCase()">
+    <input type="text" id="textInput" placeholder="텍스트를 입력하세요." oninput="this.value = this.value.toUpperCase()">
 </div>
     <div id="exScroll"></div>
 
-    <script src="jquery-3.7.1.min.js"></script>
     <script type="module" src="bezierText.js"></script>
     <script type="module" src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.0/html2canvas.min.js"></script>
