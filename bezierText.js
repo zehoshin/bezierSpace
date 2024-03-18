@@ -292,7 +292,7 @@ function ranNeon() {
 
 function ranLineWidth() {
     if (window.innerWidth <= 600) {
-        return Math.floor(Math.random() * 5) + 5; // 5~10
+        return Math.floor(Math.random() * 5) + 10; // 10~15
     } else {
         return Math.floor(Math.random() * 20) + 10; // 10~30
     }
@@ -300,11 +300,7 @@ function ranLineWidth() {
 
 function ranRadius() {
     let lineWidth = ranLineWidth();
-    if (window.innerWidth <= 600) {
-        return lineWidth + 2 + Math.floor(Math.random() * 10); // (5 + 2)~(10 + 12)
-    } else {
-        return lineWidth + 5; // (10 + 5)~(30 + 5)
-    }
+    return lineWidth + 5;
 }
 
 function ranShape() {

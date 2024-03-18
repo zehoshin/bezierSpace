@@ -24,19 +24,18 @@
         bottom: 50px;
     }
     #controlPanel {
-        width: 360px;
+        width: 365px;
         height: 210px;
         flex-wrap: wrap;
         font-size: 14px;
-        border-radius: 0px 0px 10px 10px;
         padding: 10px 10px 10px 10px;
         justify-content: space-evenly;
         align-items: stretch;
     }
+    #panelPicker {
+        width: 160px;
+    }
     #panelAll {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         top: -210px;
         left: 50%;
         transform: translateX(-50%);
@@ -57,10 +56,11 @@
         margin: 0px 15px 0px 15px;
     }
     #paramBox {
+        height: 163px;
         margin: 0px 15px 0px 15px;
     }
     #num {
-        width: 60px;
+        width: 66px;
     }
 
     @keyframes panelMotionIn {
@@ -110,12 +110,18 @@
         width: 220px;
         height: 520px;
         font-size: 17px;
-        padding: 10px 20px 10px 20px;
+        padding: 10px 20px 20px 20px;
         justify-content: space-around;
+    }
+    #panelPicker {
+        width: 160px;
     }
     #panelAll {
         top: -520px;
         left: 20px;    
+    }
+    #countBox {
+        margin-bottom: 5px;
     }
     #firstToggle {
         margin-top: 20px;
@@ -284,13 +290,15 @@ body {
 }
 
 #panelAll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: absolute;
     z-index: 10;
 }
 
 #panelPicker {
-    width: 220px;
-    height: 40px;
+    height: 38px;
     font-size: 19px;
     background-color: #111111;
     color: white;
@@ -310,7 +318,8 @@ body {
     border: 2px #111111 solid;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    background-color: rgba(0, 0, 0, 0.05)
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0px 0px 10px 10px;
 }
 
 #toggleBox {
@@ -323,7 +332,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 8px 0px 0px 0px;
+    margin: 5px 0px 0px 0px;
 }
 
 .toggleSwitch {

@@ -3,7 +3,7 @@ import { MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, Cy
 
 function CannonDebugger(scene, world, _temp) {
   let {
-    color = 0x00ff00,
+    color = 0xff0000,
     scale = 1,
     onInit,
     onUpdate
@@ -11,7 +11,7 @@ function CannonDebugger(scene, world, _temp) {
   const _meshes = [];
 
   const _material = new MeshBasicMaterial({
-    color: color != null ? color : 0x00ff00,
+    color: color != null ? color : 0xff0000,
     wireframe: true
   });
 

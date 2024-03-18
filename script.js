@@ -29,9 +29,6 @@ function genRadius() {
     }
 }
 
-
-window.innerWidth <= 600 ? 0.3 : 0.5;
-
 const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 1 );
 scene.add( light );
 
@@ -94,14 +91,21 @@ function onWindowResize() {
 
 }
 
+// const matR = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x00ffff) });
+// const geoR = new THREE.SphereGeometry(0.5, 10, 10);
+// const meshR = new THREE.Mesh(geoR, matR);
+// meshR.position.set(0,0,-2.5);
+// scene.add(meshR);
+
+
 // cannon-es.js 물리 세계 생성
 const world = new CANNON.World();
 world.gravity.set(0, 0, 0);
 world.broadphase = new CANNON.SAPBroadphase(world);
 world.solver = new CANNON.GSSolver();
 
-world.solver.iterations = 5;
-world.solver.tolerance = 0.1;
+world.solver.iterations = 10;
+world.solver.tolerance = 0.01;
 
 let cannonDebugger = new CannonDebugger( scene, world );
 
@@ -244,6 +248,7 @@ function getRandomPosition(radius) {
 let segments;
 
 function addMesh() {
+    genRadius();
     const position = getRandomPosition(radius);
     const materialIndex = Math.floor(Math.random() * materials.length);
     
@@ -336,7 +341,6 @@ function addMesh() {
     mesh.body = body;
     scene.add(mesh);
     meshes.push(mesh);
-    genRadius();
 }
 
 const plusCnt = document.getElementById('plusCnt');
@@ -601,38 +605,38 @@ const arrow = document.getElementById('arrow');
 
 toggle.addEventListener('change', function() {
     if (this.checked) {
-        toggleText.innerHTML = 'NIGHT MODE';
+        toggleText.innerHTML = 'Night Mode';
         bg.classList.add('night-mode');
         bg.classList.remove('day-mode');
         boundBox.classList.remove('blackText');
         boundBox.classList.add('whiteText');
         exScroll.style.mixBlendMode = 'screen';
         textInput.style.backgroundColor = 'white';
-        textInput.style.color = 'black';
+        textInput.style.color = '#111111';
         controlPanel.style.color = 'white';
-        controlPanel.style.fontWeight = '500';
+        controlPanel.style.fontWeight = '450';
         controlPanel.style.border = '1px #ffffff solid';
         controlPanel.style.backgroundColor ='rgba(255, 255, 255, 0.1)';
         line.forEach(el => el.style.background = 'white');
         panelPicker.style.backgroundColor = 'white';
-        panelPicker.style.color = 'black';
+        panelPicker.style.color = '#111111';
         panelPicker.style.fontWeight = '700';
         arrow.src = 'sources/arrowBK.svg';
     } else {
-        toggleText.innerHTML = 'DAY MODE';
+        toggleText.innerHTML = 'Day Mode';
         bg.classList.add('day-mode');
         bg.classList.remove('night-mode');
         boundBox.classList.remove('whiteText');
         boundBox.classList.add('blackText');
         exScroll.style.mixBlendMode = 'multiply';
-        textInput.style.backgroundColor = 'black';
+        textInput.style.backgroundColor = '#111111';
         textInput.style.color = 'white';
-        controlPanel.style.color = 'black';
+        controlPanel.style.color = '#111111';
         controlPanel.style.fontWeight = '700';
         controlPanel.style.border = '2px #111111 solid';
         controlPanel.style.backgroundColor ='rgba(0, 0, 0, 0.05)';
-        line.forEach(el => el.style.background = 'black');
-        panelPicker.style.backgroundColor = 'black';
+        line.forEach(el => el.style.background = '#111111');
+        panelPicker.style.backgroundColor = '#111111';
         panelPicker.style.color = 'white';
         panelPicker.style.fontWeight = '500';
         arrow.src = 'sources/arrowWT.svg';
@@ -643,9 +647,9 @@ const randomText = document.getElementById('randomText');
 
 random.addEventListener('change', function() {
     if (this.checked) {
-        randomText.innerHTML = 'RANDOM ON';
+        randomText.innerHTML = 'Random On';
     } else {
-        randomText.innerHTML = 'RANDOM OFF';
+        randomText.innerHTML = 'Random Off';
     }
 });
 
