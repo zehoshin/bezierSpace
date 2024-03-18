@@ -90,10 +90,24 @@
 </div>
     <div id="exScroll"></div>
 
+    <script>
+        function createCanvas(width, height, set2dTransform = true) {
+            const ratio = Math.ceil(window.devicePixelRatio);
+            const canvas = document.createElement('canvas');
+            canvas.width = width * ratio;
+            canvas.height = height * ratio;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            if (set2dTransform) {
+                canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+            }
+            return canvas;
+        }
+    </script>
     <script type="module" src="bezierText.js"></script>
     <script type="module" src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.0/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/RecordRTC/5.6.1/RecordRTC.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/RecordRTC/5.6.1/RecordRTC.min.js"></script> -->
     <script src="saveImg.js"></script>
 
 </body>
