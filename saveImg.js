@@ -1,13 +1,13 @@
 document.getElementById('saveImg').addEventListener('click', function() {
     html2canvas(document.querySelector("#captureArea"), {
         backgroundColor: null,
-        scale: Math.min(window.devicePixelRatio, 2),
+        scale: window.devicePixelRatio,
     }).then(canvas => {
         let domImage = canvas.toDataURL("image/png");
         let ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth * Math.min(window.devicePixelRatio, 2);
-        canvas.height = window.innerHeight * Math.min(window.devicePixelRatio, 2);
+        canvas.width = window.innerWidth * window.devicePixelRatio;
+        canvas.height = window.innerHeight * window.devicePixelRatio;
 
         function drawGradient(ctx, elementId, width, height) {
             let element = document.getElementById(elementId);
