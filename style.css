@@ -32,9 +32,6 @@
         justify-content: space-evenly;
         align-items: stretch;
     }
-    #panelPicker {
-        width: 160px;
-    }
     #panelAll {
         top: -210px;
         left: 50%;
@@ -112,9 +109,6 @@
         font-size: 17px;
         padding: 10px 20px 20px 20px;
         justify-content: space-around;
-    }
-    #panelPicker {
-        width: 160px;
     }
     #panelAll {
         top: -520px;
@@ -295,9 +289,11 @@ body {
     align-items: center;
     position: absolute;
     z-index: 10;
+    justify-content: space-between;
 }
 
 #panelPicker {
+    width: 90px;
     height: 38px;
     font-size: 19px;
     background-color: #111111;
@@ -305,7 +301,7 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 0px 15px 4.5px 15px;
+    padding: 0px 12px 4.5px 12px;
     border-radius: 0px 0px 10px 10px;
     font-weight: 500;
     cursor: pointer;
@@ -370,7 +366,7 @@ body {
     transition: all 0.2s ease-in;
 }
 
-#saveImg {
+.saveBtn {
     width: 40px;
     height: 20px;
     display: block;
@@ -439,5 +435,11 @@ body {
 }
 
 #arrow {
+    padding-top: 2.5px;
     width: 20px;
+}
+
+#filter {
+    padding-top: 2.5px;
+    width: 25px;
 }

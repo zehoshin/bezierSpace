@@ -2,14 +2,13 @@ import { Bezier } from "./bezier.js";
 
 
 //텍스트 div 생성 --------------------------------------------------------
-let textInput = document.getElementById('textInput');
-let container = document.getElementById('container');
-let canvas = document.getElementById('bezierCanvas');
-// let ranDice = document.getElementById('ranDice');
+const textInput = document.getElementById('textInput');
+const container = document.getElementById('container');
+const canvas = document.getElementById('bezierCanvas');
 
-let ctx = canvas.getContext('2d');
-let widthPixelRatio = window.innerWidth * Math.min(window.devicePixelRatio, 2);
-let heightPixelRatio = window.innerHeight * Math.min(window.devicePixelRatio, 2);
+const ctx = canvas.getContext('2d');
+const widthPixelRatio = window.innerWidth * window.devicePixelRatio;
+const heightPixelRatio = window.innerHeight * window.devicePixelRatio;
 let bezierCnt;
 let pointPos;
 let allControlPoints = [];
@@ -117,7 +116,6 @@ textInput.value = "영상으로 경험을 이야기합니다.";
 onTextInput(); // 초기 div 생성 및 화면 표시
 
 textInput.addEventListener('keyup', onTextInput);
-// ranDice.addEventListener('click', onTextInput);
 
 function ranTextAlign() {
     document.querySelectorAll('.textDiv').forEach((div, index) => {
@@ -130,13 +128,10 @@ function ranTextAlign() {
     genBezierCurve();
 }
 
-// ranDice.addEventListener('click', ranTextAlign);
-
 //스크롤바-------------------------------------------------------------
 const exScroll = document.getElementById('exScroll');
 let isDragging = false;
 let scrollUpd = false;
-
 
 // 스크롤 이벤트 최적화
 container.addEventListener('scroll', function() {
@@ -236,18 +231,6 @@ updScrollShape();
 
 //Bezier Curve 생성-----------------------------------------------------
 // 랜덤
-function ranColor() {
-    let code = '#';
-    let chars = "abcdef3456";
-    let string_length = 6;
-    let randomstring = '';
-    for (let i=0; i<string_length; i++) {
-    let rNum = Math.floor(Math.random() * chars.length);
-    randomstring += chars.substring(rNum,rNum+1);
-    }
-    return code + randomstring;
-}
-
 function ranNeon() {
     const hue = Math.floor(Math.random() * 360);
     const saturation = Math.random() * (100 - 70) + 70;

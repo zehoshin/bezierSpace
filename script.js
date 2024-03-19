@@ -13,13 +13,10 @@ import { bezierCnt, pointPos, ranNeon, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
 
 const scene = new THREE.Scene();
-// scene.background = new THREE.Color( 0xffffff ); 
-
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.z = 10;
 
-let extraCnt
-let radius 
+let extraCnt, radius, composer; 
 
 function genRadius() {
     if ( bezierCnt + extraCnt > 5 ) {
@@ -42,8 +39,6 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
 
 threeCanvas.appendChild( renderer.domElement );
-
-let composer
 
 init();
 
@@ -68,6 +63,8 @@ function init() {
     window.addEventListener( 'resize', onWindowResize );
 }
 
+let panelAnimation = true;
+
 function onWindowResize() {
 
     const width = window.innerWidth;
@@ -81,14 +78,13 @@ function onWindowResize() {
     renderer.setSize( width, height );
     composer.setSize( width, height );
 
+    if (panelAnimation === true) {
+        panelAll.style.top = window.innerWidth <= 600 ? '-210px' : '-520px';
+    } else {
+        panelAll.style.top = window.innerWidth <= 600 ? '-2px' : '-22px';
+    }
+    
 }
-
-// const matR = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x00ffff) });
-// const geoR = new THREE.SphereGeometry(0.5, 10, 10);
-// const meshR = new THREE.Mesh(geoR, matR);
-// meshR.position.set(0,0,-2.5);
-// scene.add(meshR);
-
 
 // cannon-es.js 물리 세계 생성
 const world = new CANNON.World();
@@ -547,11 +543,6 @@ function getViewSize(depth) {
 }
 createBoundary(1, 1, 5);
 
-// document.getElementById('ranDice').addEventListener('click', function() {
-//     soundPlay();
-//     updateScene();
-// });
-
 let lastBezierCnt = -1;
 const camZpos = document.getElementById('camZpos');
 
@@ -579,10 +570,7 @@ function animate() {
     });
     animateMeshes();
 
-
-
     // cannonDebugger.update(); 
-    // renderer.render( scene, camera );
     composer.render();
 }
 animate();
@@ -596,7 +584,13 @@ const textInput = document.getElementById('textInput');
 const controlPanel = document.getElementById('controlPanel');
 const panelPicker = document.getElementById('panelPicker');
 const line = document.querySelectorAll('.line');
+const filter = document.getElementById('filter');
 const arrow = document.getElementById('arrow');
+const randomText = document.getElementById('randomText');
+const threeOpacity = document.getElementById('threeOpacity');
+const textOpacity = document.getElementById('textOpacity');
+const bezierCanvas = document.getElementById('bezierCanvas')
+const panelAll = document.getElementById('panelAll');
 
 toggle.addEventListener('change', function() {
     if (this.checked) {
@@ -616,6 +610,7 @@ toggle.addEventListener('change', function() {
         panelPicker.style.backgroundColor = 'white';
         panelPicker.style.color = '#111111';
         panelPicker.style.fontWeight = '700';
+        filter.src = 'sources/filterBK.svg';
         arrow.src = 'sources/arrowBK.svg';
     } else {
         toggleText.innerHTML = 'Day Mode';
@@ -634,11 +629,10 @@ toggle.addEventListener('change', function() {
         panelPicker.style.backgroundColor = '#111111';
         panelPicker.style.color = 'white';
         panelPicker.style.fontWeight = '500';
+        filter.src = 'sources/filterWT.svg';
         arrow.src = 'sources/arrowWT.svg';
     }
 });
-
-const randomText = document.getElementById('randomText');
 
 random.addEventListener('change', function() {
     if (this.checked) {
@@ -647,9 +641,6 @@ random.addEventListener('change', function() {
         randomText.innerHTML = 'Random Off';
     }
 });
-
-
-const threeOpacity = document.getElementById('threeOpacity');
 
 threeOpacity.addEventListener('input', function() {
     let opacityValue = threeOpacity.value / 10;
@@ -664,9 +655,6 @@ threeOpacity.addEventListener('input', function() {
         threeCanvas.style.display = 'block';
     }
 });
-
-const textOpacity = document.getElementById('textOpacity');
-const bezierCanvas = document.getElementById('bezierCanvas')
 
 textOpacity.addEventListener('input', function() {
     let opacityValue = textOpacity.value / 10;
@@ -684,9 +672,6 @@ textOpacity.addEventListener('input', function() {
     }
 });
 
-let panelAnimation = true;
-const panelAll = document.getElementById('panelAll');
-
 panelPicker.addEventListener('click', function() {
     if (panelAnimation === true) {
         panelAll.classList.add('panelMotionIn');
@@ -695,7 +680,8 @@ panelPicker.addEventListener('click', function() {
         }, 1000);
         panelAll.style.top = window.innerWidth <= 600 ? '-2px' : '-22px';
         arrow.style.transform = 'rotate(180deg)';
-
+        arrow.style.paddingTop = '0px';
+        arrow.style.paddingBottom = '2.5px';
         panelAnimation = false;
     } else {
         panelAll.classList.add('panelMotionOut');
@@ -704,9 +690,10 @@ panelPicker.addEventListener('click', function() {
         }, 1000);
         panelAll.style.top = window.innerWidth <= 600 ? '-210px' : '-520px';
         arrow.style.transform = 'rotate(0deg)';
-
+        arrow.style.paddingTop = '2.5px';
+        arrow.style.paddingBottom = '0px';
         panelAnimation = true;
     }
-})
+});
 
 

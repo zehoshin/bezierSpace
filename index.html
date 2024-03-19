@@ -37,7 +37,11 @@
             </div>
             <div class="textFlex">
                 <div>Save as Image</div>
-                <input type="button" id="saveImg"> 
+                <input type="button" id="saveImg" class="saveBtn"> 
+            </div>
+            <div class="textFlex">
+                <div>Save as Video</div>
+                <input type="button" id="saveVideo" class="saveBtn"> 
             </div>
         </div>
         <div class="line"></div>
@@ -76,12 +80,13 @@
                 <div class="textFlex">
                     <div>Camera Position</div>
                 </div>
-                <input class="rangeInput" id="camZpos" max="30" min="5" step="1" type="range" value="2"/>            
+                <input class="rangeInput" id="camZpos" max="30" min="5" step="1" type="range" value="10"/>            
             </div>
         </div>
     </div>
     <div id="panelPicker">
-        <div>Settings</div>
+        <!-- <div>Settings</div> -->
+        <img src="./sources/filterWT.svg" id="filter" class="filter"> 
         <img src="./sources/arrowWT.svg" id="arrow" class="arrow"> 
     </div>
     </div>
