@@ -8,6 +8,8 @@ let canvas = document.getElementById('bezierCanvas');
 // let ranDice = document.getElementById('ranDice');
 
 let ctx = canvas.getContext('2d');
+let widthPixelRatio = window.innerWidth * Math.min(window.devicePixelRatio, 2);
+let heightPixelRatio = window.innerHeight * Math.min(window.devicePixelRatio, 2);
 let bezierCnt;
 let pointPos;
 let allControlPoints = [];
@@ -542,8 +544,8 @@ function updStartEndPos() {
 }
 
 function redraw() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = widthPixelRatio;
+    canvas.height = heightPixelRatio;
     ctx.clearRect(0, 0, canvas.width, canvas.height); 
 
     allControlPoints.forEach(function(curve) {

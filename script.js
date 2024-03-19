@@ -8,7 +8,6 @@ import { EffectComposer } from './postprocessing/EffectComposer.js';
 import { RenderPass } from './postprocessing/RenderPass.js';
 import { UnrealBloomPass } from './postprocessing/UnrealBloomPass.js';
 import { OutputPass } from './postprocessing/OutputPass.js';
-import WebGL from './WebGL.js';
 
 import { bezierCnt, pointPos, ranNeon, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
@@ -38,7 +37,6 @@ const renderer = new THREE.WebGLRenderer( {
     alpha: true, 
     preserveDrawingBuffer: true } ); 
 renderer.setClearColor( 0x000000, 0 );
-renderer.autoClear = false;
 renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
 renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
