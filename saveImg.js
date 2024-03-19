@@ -1,7 +1,7 @@
 document.getElementById('saveImg').addEventListener('click', function() {
     html2canvas(document.querySelector("#captureArea"), {
         backgroundColor: null,
-        scale: 1,
+        scale: Math.min(window.devicePixelRatio, 2),
     }).then(canvas => {
         let domImage = canvas.toDataURL("image/png");
         let ctx = canvas.getContext('2d');
