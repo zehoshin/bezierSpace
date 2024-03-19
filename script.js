@@ -51,7 +51,7 @@ init();
 
 function init() {
     const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: window.innerWidth <= 600 ? 1 : 8, type: THREE.HalfFloatType } );
+    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: window.innerWidth <= 600 ? 0 : 8, type: THREE.HalfFloatType } );
 
     const renderScene = new RenderPass( scene, camera );
 
