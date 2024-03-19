@@ -39,7 +39,7 @@ const renderer = new THREE.WebGLRenderer( {
     preserveDrawingBuffer: true } ); 
 renderer.setClearColor( 0x000000, 0 );
 renderer.autoClear = false;
-renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
 renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
 

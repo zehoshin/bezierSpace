@@ -6,12 +6,11 @@ document.getElementById('saveImg').addEventListener('click', function() {
         let domImage = canvas.toDataURL("image/png");
         let ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth * Math.min(window.devicePixelRatio, 2);
+        canvas.height = window.innerHeight * Math.min(window.devicePixelRatio, 2);
 
         function drawGradient(ctx, elementId, width, height) {
             let element = document.getElementById(elementId);
-            let gradient = ctx.createLinearGradient(0, 0, 0, height);
     
             if (element.classList.contains("day-mode")) {
                 ctx.fillStyle = "rgb(255, 255, 255)";
