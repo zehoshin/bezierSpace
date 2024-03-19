@@ -33,22 +33,7 @@ function genRadius() {
 const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 1 );
 scene.add( light );
 
-function createCanvas(width, height, set2dTransform = false) {
-    const ratio = Math.ceil(window.devicePixelRatio);
-    const canvas = document.createElement('canvas');
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    if (set2dTransform) {
-      canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
-    }
-    return canvas;
-}
-
-const canvas = createCanvas(window.innerWidth, window.innerHeight);
 const renderer = new THREE.WebGLRenderer( { 
-    canvas, 
     antialias: true,
     alpha: true, 
     preserveDrawingBuffer: true } ); 
@@ -66,7 +51,7 @@ init();
 
 function init() {
     const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: window.innerWidth <= 600 ? 2 : 8, type: THREE.HalfFloatType } );
+    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: window.innerWidth <= 600 ? 1 : 8, type: THREE.HalfFloatType } );
 
     const renderScene = new RenderPass( scene, camera );
 
