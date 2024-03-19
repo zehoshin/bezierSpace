@@ -93,6 +93,5 @@ function downloadVideo(url) {
     document.body.removeChild(a);
     bodyElement.style.cursor = 'default';
     videoNone.style.display = 'block';
-
 }
 

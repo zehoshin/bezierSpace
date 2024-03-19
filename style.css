@@ -1,3 +1,8 @@
+@media screen and (max-width: 450px) {
+    .not4mobile {
+        display: none;
+    }
+}
 @media screen and (max-width: 600px) {
     .textDiv {
         font-weight: 900;
@@ -59,7 +64,6 @@
     #num {
         width: 66px;
     }
-
     @keyframes panelMotionIn {
         0% {
             top: -210px;
