@@ -8,6 +8,7 @@ import { EffectComposer } from './postprocessing/EffectComposer.js';
 import { RenderPass } from './postprocessing/RenderPass.js';
 import { UnrealBloomPass } from './postprocessing/UnrealBloomPass.js';
 import { OutputPass } from './postprocessing/OutputPass.js';
+import WebGL from './WebGL.js';
 
 import { bezierCnt, pointPos, ranNeon, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
@@ -52,6 +53,8 @@ const renderer = new THREE.WebGLRenderer( {
     alpha: true, 
     preserveDrawingBuffer: true } ); 
 renderer.setClearColor( 0x000000, 0 );
+renderer.autoClear = false;
+renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
 
@@ -62,6 +65,9 @@ let composer
 init();
 
 function init() {
+    const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 8, type: THREE.HalfFloatType } );
+
     const renderScene = new RenderPass( scene, camera );
 
     const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
@@ -71,7 +77,7 @@ function init() {
 
     const outputPass = new OutputPass();
 
-    composer = new EffectComposer( renderer );
+    composer = new EffectComposer( renderer, renderTarget );
     composer.addPass( renderScene );
     composer.addPass( bloomPass );
     composer.addPass( outputPass );
@@ -85,6 +91,8 @@ function onWindowResize() {
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    
+    createBoundary(1, 1, 5);
 
     renderer.setSize( width, height );
     composer.setSize( width, height );
@@ -563,14 +571,14 @@ createBoundary(1, 1, 5);
 let lastBezierCnt = -1;
 const camZpos = document.getElementById('camZpos');
 
+camZpos.addEventListener('input', function() {
+    camera.position.z = camZpos.value;
+    createBoundary(1, 1, 5);
+});
+
 function animate() {
     requestAnimationFrame(animate);
-
-    camZpos.addEventListener('input', function() {
-        camera.position.z = camZpos.value * 5;
-        createBoundary(1, 1, 5);
-    });
-    
+   
     applyRadialForces();
     if (bezierCnt !== lastBezierCnt) {
         updateScene();
@@ -586,6 +594,9 @@ function animate() {
         mesh.quaternion.copy(mesh.body.quaternion);
     });
     animateMeshes();
+
+
+
     // cannonDebugger.update(); 
     // renderer.render( scene, camera );
     composer.render();
