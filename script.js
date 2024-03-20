@@ -14,7 +14,7 @@ import CannonDebugger from './cannon-es-debugger.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 10;
+camera.position.z = 7;
 
 let extraCnt, radius, composer; 
 
@@ -26,7 +26,7 @@ function genRadius() {
     }
 }
 
-const light = new THREE.HemisphereLight( 0xffffff, 0x080820, 1 );
+const light = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
 scene.add( light );
 
 const renderer = new THREE.WebGLRenderer( { 
@@ -57,7 +57,7 @@ function init() {
 
     composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
     composer.addPass( renderScene );
-    composer.addPass( bloomPass );
+    // composer.addPass( bloomPass );
     composer.addPass( outputPass );
     composer.setSize( window.innerWidth, window.innerHeight );
     window.addEventListener( 'resize', onWindowResize );
@@ -176,12 +176,15 @@ const fake_Normal = new THREE.TextureLoader().load( "" );
 const fake_Roughness = new THREE.TextureLoader().load( "" );
 
 const materials = [
-    '2dColor', // 0 원색
-    'basicColor', // 1 Basic
-    'wireFrame', // 2 원색.wireFrame
-    // new THREE.MeshNormalMaterial(), // 3 Normal
-    (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = true; return m; })(), // 4 Normal.flatShading
-    'metal', // 5 Metal
+    // '2dColor',
+    // '2dColor',
+    'basicColor',
+    'basicColor',
+    'basicColor',
+    'basicColor',
+    'wireFrame',
+    // (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = false; return m; })(), // Normal.flatShading
+    'metal',
 ];
 
 function getShapeForGeometry(geometry, scale) {
@@ -276,7 +279,7 @@ function addMesh() {
         const lineGeometry = new LineSegmentsGeometry().fromEdgesGeometry(edges);
         const lineMaterial = new LineMaterial({
             color: ranNeon(),
-            linewidth: window.innerWidth <= 600 ? 2 : 3.5, 
+            linewidth: window.innerWidth <= 600 ? 2 : 2.5, 
         });
 
         const line = new Line2(lineGeometry, lineMaterial);
@@ -295,7 +298,7 @@ function addMesh() {
             material = new THREE.MeshStandardMaterial({ 
                 color: ranNeon(),
                 emissive: ranNeon(),
-                emissiveIntensity: 0.6,
+                emissiveIntensity: 1,
                 envMap: envSky,
                 map: fake_Color, 
                 normalMap: fake_Normal,
@@ -416,11 +419,22 @@ function cubicBezier(t, p0, p1, p2, p3) {
 }
 
 const random = document.getElementById('random');
+let ranChecked = true;
+
+random.addEventListener('click', function() {
+    if (ranChecked === true) {
+        random.style.opacity = 0.3;
+        ranChecked = false;
+    } else {
+        random.style.opacity = 1.0;
+        ranChecked = true;
+    }
+});
 
 function animateMeshes() {
     const currentTime = (new Date()).getTime() / 500;
 
-    if (random.checked && (Math.abs(pointPos - 0.99) < 0.01)) {
+    if (ranChecked === true && (Math.abs(pointPos - 0.99) < 0.01)) {
         soundPlay();
         updateScene();
         ranTextAlign();
@@ -576,25 +590,27 @@ function animate() {
 animate();
 
 //UI BUTTON------------------------------------------------------------
+const dayNight = document.getElementById('dayNight');
+
 const boundBox = document.getElementById('boundBox');
-const toggle = document.getElementById('toggle');
-const toggleText = document.getElementById('toggleText');
 const bg = document.getElementById('bg');
 const textInput = document.getElementById('textInput');
 const controlPanel = document.getElementById('controlPanel');
-const panelPicker = document.getElementById('panelPicker');
-const line = document.querySelectorAll('.line');
-const filter = document.getElementById('filter');
-const arrow = document.getElementById('arrow');
-const randomText = document.getElementById('randomText');
 const threeOpacity = document.getElementById('threeOpacity');
 const textOpacity = document.getElementById('textOpacity');
 const bezierCanvas = document.getElementById('bezierCanvas')
 const panelAll = document.getElementById('panelAll');
 
-toggle.addEventListener('change', function() {
-    if (this.checked) {
-        toggleText.innerHTML = 'Night Mode';
+const cube = document.getElementById('cube');
+const saveImg = document.getElementById('saveImg');
+const settings = document.getElementById('settings');
+const rangeInput = document.querySelectorAll ('.rangeInput');
+const setCircle = document.getElementById('setCircle');
+
+let isNight = true;
+
+dayNight.addEventListener('click', function() {
+    if ( isNight === true ) {
         bg.classList.add('night-mode');
         bg.classList.remove('day-mode');
         boundBox.classList.remove('blackText');
@@ -602,18 +618,27 @@ toggle.addEventListener('change', function() {
         exScroll.style.mixBlendMode = 'screen';
         textInput.style.backgroundColor = 'white';
         textInput.style.color = '#111111';
+
         controlPanel.style.color = 'white';
+        controlPanel.style.border = '2px #ffffff solid';
         controlPanel.style.fontWeight = '450';
-        controlPanel.style.border = '1px #ffffff solid';
-        controlPanel.style.backgroundColor ='rgba(255, 255, 255, 0.1)';
-        line.forEach(el => el.style.background = 'white');
-        panelPicker.style.backgroundColor = 'white';
-        panelPicker.style.color = '#111111';
-        panelPicker.style.fontWeight = '700';
-        filter.src = 'sources/filterBK.svg';
-        arrow.src = 'sources/arrowBK.svg';
+        controlPanel.style.backgroundColor ='rgba(0, 0, 0, 0.66)';
+        setCircle.style.border = controlPanel.style.border;
+        setCircle.style.backgroundColor = controlPanel.style.backgroundColor;
+        
+        dayNight.src = 'sources/ICON_dayMode.svg';
+        random.src = 'sources/ICON_ranNight.svg';
+        minusCnt.src = 'sources/ICON_minusNight.svg';
+        cube.src = 'sources/ICON_cntNight.svg';
+        plusCnt.src = 'sources/ICON_plusNight.svg';
+        saveImg.src = 'sources/ICON_imgNight.svg';
+        settings.src = 'sources/ICON_settingNight.svg';
+        rangeInput.forEach(el => el.style.accentColor = 'white');
+        num.style.color = 'white';
+        num.style.fontWeight = '700';
+
+        isNight = false;
     } else {
-        toggleText.innerHTML = 'Day Mode';
         bg.classList.add('day-mode');
         bg.classList.remove('night-mode');
         boundBox.classList.remove('whiteText');
@@ -621,24 +646,39 @@ toggle.addEventListener('change', function() {
         exScroll.style.mixBlendMode = 'multiply';
         textInput.style.backgroundColor = '#111111';
         textInput.style.color = 'white';
-        controlPanel.style.color = '#111111';
-        controlPanel.style.fontWeight = '700';
+
+        controlPanel.style.color = 'black';
         controlPanel.style.border = '2px #111111 solid';
-        controlPanel.style.backgroundColor ='rgba(0, 0, 0, 0.05)';
-        line.forEach(el => el.style.background = '#111111');
-        panelPicker.style.backgroundColor = '#111111';
-        panelPicker.style.color = 'white';
-        panelPicker.style.fontWeight = '500';
-        filter.src = 'sources/filterWT.svg';
-        arrow.src = 'sources/arrowWT.svg';
+        controlPanel.style.fontWeight = '700';
+        controlPanel.style.backgroundColor ='rgba(255, 255, 255, 0.66)';
+        setCircle.style.border = controlPanel.style.border;
+        setCircle.style.backgroundColor = controlPanel.style.backgroundColor;
+
+        dayNight.src = 'sources/ICON_nightMode.svg';
+        random.src = 'sources/ICON_ranDay.svg';
+        minusCnt.src = 'sources/ICON_minusDay.svg';
+        cube.src = 'sources/ICON_cntDay.svg';
+        plusCnt.src = 'sources/ICON_plusDay.svg';
+        saveImg.src = 'sources/ICON_imgDay.svg';
+        settings.src = 'sources/ICON_settingDay.svg';
+        rangeInput.forEach(el => el.style.accentColor = '#111111');
+        num.style.color = '#111111';
+        num.style.fontWeight = '800';
+
+        isNight = true;
     }
 });
 
-random.addEventListener('change', function() {
-    if (this.checked) {
-        randomText.innerHTML = 'Random On';
+let isSettingsOff = true;
+settings.addEventListener('click', function() {
+    if ( isSettingsOff === true ) {
+        controlPanel.style.display = 'flex';
+        setCircle.style.display = 'block';
+        isSettingsOff = false;
     } else {
-        randomText.innerHTML = 'Random Off';
+        controlPanel.style.display = 'none';
+        setCircle.style.display ='none';
+        isSettingsOff = true;
     }
 });
 
@@ -671,29 +711,4 @@ textOpacity.addEventListener('input', function() {
         bezierCanvas.style.display = 'block';
     }
 });
-
-panelPicker.addEventListener('click', function() {
-    if (panelAnimation === true) {
-        panelAll.classList.add('panelMotionIn');
-        setTimeout(() => {
-            panelAll.classList.remove('panelMotionIn');
-        }, 1000);
-        panelAll.style.top = window.innerWidth <= 600 ? '-2px' : '-22px';
-        arrow.style.transform = 'rotate(180deg)';
-        arrow.style.paddingTop = '0px';
-        arrow.style.paddingBottom = '2.5px';
-        panelAnimation = false;
-    } else {
-        panelAll.classList.add('panelMotionOut');
-        setTimeout(() => {
-            panelAll.classList.remove('panelMotionOut');
-        }, 1000);
-        panelAll.style.top = window.innerWidth <= 600 ? '-210px' : '-520px';
-        arrow.style.transform = 'rotate(0deg)';
-        arrow.style.paddingTop = '2.5px';
-        arrow.style.paddingBottom = '0px';
-        panelAnimation = true;
-    }
-});
-
 

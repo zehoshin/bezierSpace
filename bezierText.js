@@ -232,9 +232,9 @@ updScrollShape();
 //Bezier Curve 생성-----------------------------------------------------
 // 랜덤
 function ranNeon() {
-    const hue = Math.floor(Math.random() * 360);
-    const saturation = Math.random() * (100 - 70) + 70;
-    const lightness = Math.random() * (80 - 50) + 50;
+    const hue = Math.floor((Math.random() * 36) * 10);
+    const saturation = 100;
+    const lightness = 50;
 
     function hslToRgb(h, s, l) {
         s /= 100;
@@ -277,9 +277,9 @@ function ranNeon() {
 
 function ranLineWidth() {
     if (window.innerWidth <= 600) {
-        return Math.floor(Math.random() * 5) + 10; // 10~15
+        return Math.floor(Math.random() * 2) + 3;
     } else {
-        return Math.floor(Math.random() * 20) + 10; // 10~30
+        return Math.floor(Math.random() * 3) + 5;
     }
 }
 
@@ -382,11 +382,11 @@ function drawControlLines(curve) {
     ctx.lineWidth = curve.lineWidth;
     ctx.antialias = true
 
-    if (curve.lineStyle === 'dashed') {
-        ctx.setLineDash([curve.lineWidth, curve.lineWidth]);
-    } else {
-        ctx.setLineDash([]);
-    }
+    // if (curve.lineStyle === 'dashed') {
+    //     ctx.setLineDash([curve.lineWidth, curve.lineWidth]);
+    // } else {
+    //     ctx.setLineDash([]);
+    // }
     ctx.stroke();
     ctx.setLineDash([]);
 }
@@ -466,7 +466,7 @@ function genBezierCurve() {
                 shape: ranShape(),
                 color: ranNeon(),
                 lineWidth: ranLineWidth(),
-                lineStyle: Math.random() < 0.4 ? 'dashed' : 'solid',
+                // lineStyle: Math.random() < 0.4 ? 'dashed' : 'solid',
                 radius: ranRadius(),
                 currentPoint: 0, 
                 direction: 1,

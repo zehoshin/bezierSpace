@@ -26,59 +26,7 @@
     }
     #textInput {
         width: 320px;
-        bottom: 50px;
-    }
-    #controlPanel {
-        width: 365px;
-        height: 210px;
-        flex-wrap: wrap;
-        font-size: 14px;
-        padding: 10px 10px 10px 10px;
-        justify-content: space-evenly;
-        align-items: stretch;
-    }
-    #panelAll {
-        top: -210px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    #line2 {
-        display: none;
-    }
-    #firstToggle {
-        margin-top: 0px;
-    }
-    .line {
-        margin: 0px 15px 0px 15px;
-    }
-    #toggleBox {
-        margin: 0px 15px 0px 15px;
-    }
-    #countBox {
-        margin: 0px 15px 0px 15px;
-    }
-    #paramBox {
-        height: 163px;
-        margin: 0px 15px 0px 15px;
-    }
-    #num {
-        width: 66px;
-    }
-    @keyframes panelMotionIn {
-        0% {
-            top: -210px;
-        }
-        100% {
-            top: -2px;
-        }
-    }
-    @keyframes panelMotionOut {
-        0% {
-            top: -2px;
-        }
-        100% {
-            top: -210px;
-        }
+        bottom: 90px;
     }
 }
 @media screen and (min-width: 600px) {
@@ -105,44 +53,7 @@
     }
     #textInput {
         width: 350px;
-        bottom: 80px;
-    }
-    #controlPanel {
-        width: 220px;
-        height: 520px;
-        font-size: 17px;
-        padding: 10px 20px 20px 20px;
-        justify-content: space-around;
-    }
-    #panelAll {
-        top: -520px;
-        left: 20px;    
-    }
-    #countBox {
-        margin-bottom: 5px;
-    }
-    #firstToggle {
-        margin-top: 20px;
-    }
-    #num {
-        width: 95px;
-    }
-
-    @keyframes panelMotionIn {
-        0% {
-            top: -520px;
-        }
-        100% {
-            top: -22px;
-        }
-    }
-    @keyframes panelMotionOut {
-        0% {
-            top: -22px;
-        }
-        100% {
-            top: -520px;
-        }
+        bottom: 90px;
     }
 }
 
@@ -165,12 +76,12 @@
 
 .whiteText {
     color: rgb(255, 255, 255);
-    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.9);
+    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
 }
 
 .blackText {
     color: rgb(0, 0, 0);
-    text-shadow: 0px 0px 20px rgba(255, 255, 255, 1);
+    /* text-shadow: 0px 0px 20px rgba(255, 255, 255, 1); */
 }
 
 
@@ -243,7 +154,6 @@ body {
     margin-right: auto;
 }
 
-
 .textCircle {
     border-radius: 50%;
     background-color: #ff0000;
@@ -277,55 +187,26 @@ body {
     z-index: -1;
 }
 
-.panelMotionIn {
-    animation: panelMotionIn 1s cubic-bezier(.15,.8,.6,1) forwards;
-}
-
-
-
-.panelMotionOut {
-    animation: panelMotionOut 1s cubic-bezier(.15,.8,.6,1) forwards;
-}
-
-#panelAll {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: absolute;
-    z-index: 10;
-    justify-content: space-between;
-}
-
-#panelPicker {
-    width: 90px;
-    height: 38px;
-    font-size: 19px;
-    background-color: #111111;
-    color: white;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 0px 12px 4.5px 12px;
-    border-radius: 0px 0px 10px 10px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
 #controlPanel {
-    display: flex;
+    position: absolute;
+    bottom: 85px;
+    left: 50%;
+
     flex-direction: column;
     font-weight: 700;
     border: 2px #111111 solid;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 0px 0px 10px 10px;
-}
-
-#toggleBox {
-    display: flex;
-    flex-direction: column;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    background-color: rgba(255, 255, 255, 0.66);
+    border-radius: 10px;
+    width: 180px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    padding: 14px;
     justify-content: space-evenly;
+    align-items: stretch;
+    
+    display: none;
 }
 
 .textFlex {
@@ -333,60 +214,6 @@ body {
     justify-content: space-between;
     align-items: center;
     margin: 5px 0px 0px 0px;
-}
-
-.toggleSwitch {
-    width: 40px;
-    height: 20px;
-    display: block;
-    position: relative;
-    border-radius: 20px;
-    background-color: #fff;
-    cursor: pointer;
-    margin-top: 1px;
-  }
-  
-.toggleSwitch .toggleButton {
-    width: 16px;
-    height: 16px;
-    position: absolute;
-    top: 50%;
-    left: 3px;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    background: #111111;
-}
-
-[type="checkbox"]:checked ~ .toggleSwitch {
-    background: #111111;
-}
-
-[type="checkbox"]:checked ~ .toggleSwitch .toggleButton {
-    left: calc(100% - 19px);
-    background: #fff;
-}
-
-.toggleSwitch, .toggleButton {
-    transition: all 0.2s ease-in;
-}
-
-.saveBtn {
-    width: 40px;
-    height: 20px;
-    display: block;
-    position: relative;
-    border-radius: 20px;
-    border: 0;
-    background-color: #fff;
-    background-image: url(./sources/saveImg.svg);
-    cursor: pointer;
-    margin-top: 1px;
-}
-
-.line {
-    height: 1.5px;
-    background: black;
-    opacity: 0.4;
 }
 
 .paramWithText {
@@ -397,53 +224,64 @@ body {
 
 .rangeInput{
     width: 100%;
-    accent-color: #ffffff;
+    accent-color: #111111;
     cursor: pointer;
 }
 
-#wrapper {
-    margin-top: 7px;
-    width: 100%;
+.dock {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    width: 370px;
     align-items: center;
+    justify-content: space-evenly;
 }
 
-.plusminus {
-    border: 2px rgb(255, 255, 255) solid;
-    background: #ffffff;
-    border-radius: 100%;
-    height: 34px;
-    width: 34px;
-    font-size: 28px;
-    font-weight: 200;
-    color: black;
+.icon {
+    width: 40px;
     cursor: pointer;
 }
 
-#minusCnt {
-    background-image: url(./sources/minusCnt.svg);
+.meshCnts {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
-#plusCnt {
-    background-image: url(./sources/plusCnt.svg);
+
+.iconCube {
+    width: 60px;
+    cursor: pointer;
+}
+
+.iconCnt {
+    width: 20px;
+    cursor: pointer;
 }
 
 #num {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    padding-bottom: 3.25px;
+}
+
+#setCircle {
+    display: none;
+    position: absolute;
+    z-index: -5;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
     border: 2px #111111 solid;
-    background-color: #111111;
-    border-radius: 30px;
-    height: 36px;
-    font-size: 20px;
-    text-align: center;  
-    color: white;
-}
-
-#arrow {
-    padding-top: 2.5px;
-    width: 20px;
-}
-
-#filter {
-    padding-top: 2.5px;
-    width: 25px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    background-color: rgba(255, 255, 255, 0.66);
+    right: 13px;
 }
