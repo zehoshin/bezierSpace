@@ -24,10 +24,6 @@
         width: 15px;
         right: 20px;
     }
-    #textInput {
-        width: 320px;
-        bottom: 90px;
-    }
 }
 @media screen and (min-width: 600px) {
     .textDiv {
@@ -50,10 +46,6 @@
     #exScroll {
         width: 20px;
         right: 20px;
-    }
-    #textInput {
-        width: 350px;
-        bottom: 90px;
     }
 }
 
@@ -114,6 +106,8 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    width: 325px;
+    bottom: 90px;
     background-color: #111111;
     color: white;
     border: 0;
