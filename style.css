@@ -94,7 +94,7 @@ body {
 }
 
 #exScroll {
-    mix-blend-mode: screen;
+    mix-blend-mode: multiply;
     border-radius: 10px;
     background: #ccc;
     position: absolute;
@@ -285,7 +285,7 @@ body {
     top: 20px;
     right: 20px;
     width: 50px;
-    opacity: 0.0;
+    opacity: 0.5;
 }
 
 @keyframes spin {
@@ -340,4 +340,22 @@ body {
     width: 15px;
     height: 15px;
     transform: rotate(45deg);
+}
+
+.aboutDiv {
+    background-color: rgba(0, 0, 0, 0.75);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+    text-align: center;
+    font-size: 72px;
+    font-weight: 600;
 }

@@ -32,7 +32,8 @@ scene.add( light );
 const renderer = new THREE.WebGLRenderer( { 
     antialias: true,
     alpha: true, 
-    preserveDrawingBuffer: true } ); 
+    preserveDrawingBuffer: true,
+    powerPreference: "high-performance"  } ); 
 renderer.setClearColor( 0x000000, 0 );
 renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -44,14 +45,14 @@ init();
 
 function init() {
     const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 2, type: THREE.HalfFloatType } );
+    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 4, type: THREE.HalfFloatType } );
 
     const renderScene = new RenderPass( scene, camera );
 
     const outputPass = new OutputPass();
 
-    // composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
-    composer = new EffectComposer( renderer );
+    composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
+    // composer = new EffectComposer( renderer );
     composer.addPass( renderScene );
     composer.addPass( outputPass );
     composer.setSize( window.innerWidth, window.innerHeight );
@@ -355,8 +356,8 @@ const fileList = document.getElementById('fileList');
 chooseFile.addEventListener('input', loadFile);
 
 const imgMeshes = [];
-let deleteImgList;
-let deleteImg;
+let deleteImgList = [];
+let deleteImg = [];
 let isNight = true;
 
 function loadFile(event) {
@@ -848,11 +849,23 @@ textOpacity.addEventListener('input', function() {
 
     const textOpacityText = document.getElementById('textOpacityText')
     textOpacityText.innerHTML = (opacityValue * 100) + '%';
-    
-    if (opacityValue == 0) {
-        bezierCanvas.style.display = 'none';
-    } else {
-        bezierCanvas.style.display = 'block';
-    }
+
 });
 
+const aboutIcon = document.getElementById('aboutIcon');
+const aboutDiv = document.getElementById('aboutDiv');
+const allWithoutAbout = document.getElementById('allWithoutAbout');
+
+let isAboutNone = true;
+
+aboutIcon.addEventListener('click', function() {
+    if ( isAboutNone === true ) {
+        aboutDiv.style.display = 'flex';
+        allWithoutAbout.style.filter = 'blur(2px)';
+        isAboutNone = false;
+    } else {
+        aboutDiv.style.display = 'none';
+        allWithoutAbout.style.filter = 'blur(0px)';
+        isAboutNone = true;
+    }
+});
