@@ -717,6 +717,65 @@ function animate() {
 animate();
 
 //UI BUTTON------------------------------------------------------------
+
+function underHeight750() {
+    const headline = document.querySelectorAll('.headline');
+    const content = document.querySelectorAll('.content');
+    const hyperlink = document.querySelectorAll('.hyperlink');
+    const aboutContent = document.querySelectorAll('.aboutContent');
+    const iconText = document.getElementById('iconText');
+
+    if (window.innerHeight < 750) {
+        headline.forEach(el => {
+            el.style.fontSize = '30px';
+        });
+        content.forEach(el => {
+            el.style.fontSize = '17px';
+        });
+        hyperlink.forEach(el => {
+            el.style.fontSize = '14px';
+        });
+        aboutContent.forEach(el => {
+            el.style.margin = '20px 0px 10px 0px';
+        });
+        iconText.style.fontSize = '14px';
+        iconText.style.margin = '10px 0px 20px 0px';
+    } else if ( window.innerHeight >= 750 && window.innerWidth <= 900 ) {
+        headline.forEach(el => {
+            el.style.fontSize = '36px';
+        });
+        content.forEach(el => {
+            el.style.fontSize = '20px';
+        });
+        hyperlink.forEach(el => {
+            el.style.fontSize = '15px';
+        });
+        aboutContent.forEach(el => {
+            el.style.margin = '60px 0px 20px 0px';
+        });
+        iconText.style.fontSize = '16px';
+        iconText.style.margin = '20px 0px 40px 0px';
+    } else if ( window.innerHeight >= 750 && window.innerWidth > 900 ) {
+        headline.forEach(el => {
+            el.style.fontSize = '72px';
+        });
+        content.forEach(el => {
+            el.style.fontSize = '28px';
+        });
+        hyperlink.forEach(el => {
+            el.style.fontSize = '18px';
+        });
+        aboutContent.forEach(el => {
+            el.style.margin = '60px 0px 20px 0px';
+        });
+        iconText.style.fontSize = '16px';
+        iconText.style.margin = '20px 0px 40px 0px';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", underHeight750);
+window.addEventListener('resize', underHeight750);
+
 const dayNight = document.getElementById('dayNight');
 
 const boundBox = document.getElementById('boundBox');
@@ -878,61 +937,4 @@ aboutIcon.addEventListener('click', function() {
     }
 });
 
-function underHeight750() {
-    const headline = document.querySelectorAll('.headline');
-    const content = document.querySelectorAll('.content');
-    const hyperlink = document.querySelectorAll('.hyperlink');
-    const aboutContent = document.querySelectorAll('.aboutContent');
-    const iconText = document.getElementById('iconText');
-
-    if (window.innerHeight < 750) {
-        headline.forEach(el => {
-            el.style.fontSize = '30px';
-        });
-        content.forEach(el => {
-            el.style.fontSize = '17px';
-        });
-        hyperlink.forEach(el => {
-            el.style.fontSize = '14px';
-        });
-        aboutContent.forEach(el => {
-            el.style.margin = '20px 0px 10px 0px';
-        });
-        iconText.style.fontSize = '14px';
-        iconText.style.margin = '10px 0px 20px 0px';
-    } else if ( window.innerHeight >= 750 && window.innerWidth <= 900 ) {
-        headline.forEach(el => {
-            el.style.fontSize = '36px';
-        });
-        content.forEach(el => {
-            el.style.fontSize = '20px';
-        });
-        hyperlink.forEach(el => {
-            el.style.fontSize = '15px';
-        });
-        aboutContent.forEach(el => {
-            el.style.margin = '60px 0px 20px 0px';
-        });
-        iconText.style.fontSize = '16px';
-        iconText.style.margin = '20px 0px 40px 0px';
-    } else if ( window.innerHeight >= 750 && window.innerWidth > 900 ) {
-        headline.forEach(el => {
-            el.style.fontSize = '72px';
-        });
-        content.forEach(el => {
-            el.style.fontSize = '28px';
-        });
-        hyperlink.forEach(el => {
-            el.style.fontSize = '18px';
-        });
-        aboutContent.forEach(el => {
-            el.style.margin = '60px 0px 20px 0px';
-        });
-        iconText.style.fontSize = '16px';
-        iconText.style.margin = '20px 0px 40px 0px';
-    }
-}
-
-document.addEventListener("DOMContentLoaded", underHeight750);
-window.addEventListener('resize', underHeight750);
 
