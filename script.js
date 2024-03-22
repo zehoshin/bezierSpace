@@ -878,14 +878,14 @@ aboutIcon.addEventListener('click', function() {
     }
 });
 
-function underHeight700() {
+function underHeight750() {
     const headline = document.querySelectorAll('.headline');
     const content = document.querySelectorAll('.content');
     const hyperlink = document.querySelectorAll('.hyperlink');
     const aboutContent = document.querySelectorAll('.aboutContent');
     const iconText = document.getElementById('iconText');
 
-    if (window.innerHeight < 700) {
+    if (window.innerHeight < 750) {
         headline.forEach(el => {
             el.style.fontSize = '30px';
         });
@@ -900,7 +900,7 @@ function underHeight700() {
         });
         iconText.style.fontSize = '14px';
         iconText.style.margin = '10px 0px 20px 0px';
-    } else if ( window.innerHeight >= 700 && window.innerWidth <= 900 ) {
+    } else if ( window.innerHeight >= 750 && window.innerWidth <= 900 ) {
         headline.forEach(el => {
             el.style.fontSize = '36px';
         });
@@ -911,11 +911,11 @@ function underHeight700() {
             el.style.fontSize = '15px';
         });
         aboutContent.forEach(el => {
-            el.style.margin = '40px 0px 20px 0px';
+            el.style.margin = '60px 0px 20px 0px';
         });
         iconText.style.fontSize = '16px';
         iconText.style.margin = '20px 0px 40px 0px';
-    } else if ( window.innerHeight >= 700 && window.innerWidth > 900 ) {
+    } else if ( window.innerHeight >= 750 && window.innerWidth > 900 ) {
         headline.forEach(el => {
             el.style.fontSize = '72px';
         });
@@ -926,13 +926,13 @@ function underHeight700() {
             el.style.fontSize = '18px';
         });
         aboutContent.forEach(el => {
-            el.style.margin = '40px 0px 20px 0px';
+            el.style.margin = '60px 0px 20px 0px';
         });
         iconText.style.fontSize = '16px';
         iconText.style.margin = '20px 0px 40px 0px';
     }
 }
 
-document.addEventListener("DOMContentLoaded", underHeight700);
-window.addEventListener('resize', underHeight700);
+document.addEventListener("DOMContentLoaded", underHeight750);
+window.addEventListener('resize', underHeight750);
 
