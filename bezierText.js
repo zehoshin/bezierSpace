@@ -3,6 +3,8 @@ import { Bezier } from "./bezier.js";
 
 //텍스트 div 생성 --------------------------------------------------------
 const textInput = document.getElementById('textInput');
+const fakeTextInput = document.getElementById('fakeTextInput');
+
 const container = document.getElementById('container');
 const canvas = document.getElementById('bezierCanvas');
 
@@ -49,6 +51,10 @@ function textJustify() {
 function onTextInput() {
     let textValue = textInput.value;
     let textArray = textValue.split(' ');
+
+    let fakeTextValue = fakeTextInput.value;
+    let fakeTextArray = fakeTextValue.split(' ');
+
     let currentCircleNums = new Set();
 
     // div 초기화
@@ -59,6 +65,35 @@ function onTextInput() {
 
     // div 생성
     textArray.forEach(function(text, index) {
+        if (text.trim() !== '') { //값이 있을 때 실행
+            
+            let textDiv = document.createElement('div');
+            textDiv.className = 'textDiv';          
+
+            // 앞 원 생성 및 번호 할당
+            createCircle(textDiv, index * 2 + 1);
+
+            // 텍스트 추가
+            let textNode = document.createTextNode(text);
+            textDiv.appendChild(textNode);
+
+            // 뒤 원 생성 및 번호 할당
+            createCircle(textDiv, index * 2 + 2);
+                            
+            container.appendChild(textDiv);
+
+            if (index === 0) {
+                textDiv.style.textAlign = 'center';
+            } else {
+                const circleNum = index * 2 + 2; // 뒤에 오는 circle 기준
+                currentCircleNums.add(`textCircleNum${circleNum}`);
+                const textAlignValue = getTextAlignValue(circleNum, index);
+                textDiv.style.textAlign = textAlignValue;
+            }
+        }
+    });
+    // div 생성
+    fakeTextArray.forEach(function(text, index) {
         if (text.trim() !== '') { //값이 있을 때 실행
             
             let textDiv = document.createElement('div');
@@ -111,9 +146,21 @@ function getTextAlignValue(circleNum) {
     return textAlignMap[key];
 }
 
-// 초기화: 기본 문장 설정
-textInput.value = "영상으로 경험을 이야기합니다.";
+function typeText() {
+    fakeTextInput.addEventListener('th.afterType', onTextInput);
+    TypeHangul.type('#fakeTextInput', {
+        text: "영상으로 경험을 이야기합니다.",
+        intervalType: 90,
+    });
+}
+
+typeText();
+
 onTextInput(); // 초기 div 생성 및 화면 표시
+
+textInput.addEventListener('keyup', function() {
+    fakeTextInput.value = "";
+});
 
 textInput.addEventListener('keyup', onTextInput);
 

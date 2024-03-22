@@ -102,7 +102,7 @@ body {
     opacity: 0.5;
 }
 
-#textInput {
+.textInput {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -117,7 +117,6 @@ body {
     font-weight: 450;
     height: 40px;
     padding: 10px 14px 12px 14px;
-
 }
 
 #boundBox {
@@ -179,6 +178,7 @@ body {
     opacity: 0.9;
     overflow: hidden;
     z-index: -1;
+    filter: saturate(1.3);
 }
 
 #controlPanel {
@@ -278,4 +278,66 @@ body {
     -webkit-backdrop-filter: blur(2px);
     background-color: rgba(255, 255, 255, 0.66);
     right: 13px;
+}
+
+.about {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    opacity: 0.0;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.rotate {
+    animation: spin 1s cubic-bezier(.15,.8,.6,1) forwards;
+}
+
+#chooseFile {
+    display: none;
+}
+
+.flexRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.imgBtn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: #111111;
+    border-radius: 4px;
+    margin-top: 4px;
+    padding: 2px 0px 3px 0px;
+    color: white;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.deleteImgList {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    background-color: white;
+    border-radius: 4px;
+    margin-top: 4px;
+    padding: 2px 6px 3px 9px;
+    color: #111111;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.deleteImg {
+    background: url(./sources/ICON_plusDay.svg);
+    background-repeat: no-repeat;
+    width: 15px;
+    height: 15px;
+    transform: rotate(45deg);
 }

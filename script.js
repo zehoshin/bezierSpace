@@ -77,13 +77,7 @@ function onWindowResize() {
 
     renderer.setSize( width, height );
     composer.setSize( width, height );
-
-    if (panelAnimation === true) {
-        panelAll.style.top = window.innerWidth <= 600 ? '-210px' : '-520px';
-    } else {
-        panelAll.style.top = window.innerWidth <= 600 ? '-2px' : '-22px';
-    }
-    
+   
 }
 
 // cannon-es.js 물리 세계 생성
@@ -363,6 +357,136 @@ minusCnt.addEventListener('click', function() {
     }
 });
 
+const chooseFile = document.getElementById('chooseFile');
+const fileList = document.getElementById('fileList');
+chooseFile.addEventListener('input', loadFile);
+
+const imgMeshes = [];
+let deleteImgList;
+let deleteImg;
+let isNight = true;
+
+function loadFile(event) {
+    const input = event.target;
+    const file = event.target.files[0];
+
+    if (input.files && input.files[0]) {
+        let fileOnlyName = file.name.replace(/\.[^/.]+$/, "");
+        let fileExtension = file.name.split('.').pop();
+        let displayedName = fileOnlyName.length > 10
+            ? `${fileOnlyName.substring(0, 10)}...${fileExtension}`
+            : file.name;
+        
+        const deleteImgListDiv = document.createElement('div');
+        deleteImgListDiv.className = 'deleteImgList';
+        let timestamp = Date.now();
+        let uniqueId = `${timestamp}`;
+        deleteImgListDiv.id = uniqueId;
+
+        const fileNameDiv = document.createElement('div');
+        fileNameDiv.textContent = displayedName;
+        
+        const deleteImgDiv = document.createElement('div');
+        deleteImgDiv.className = 'deleteImg';
+
+        deleteImgListDiv.appendChild(fileNameDiv);
+        deleteImgListDiv.appendChild(deleteImgDiv);
+        
+        fileList.appendChild(deleteImgListDiv);
+
+        deleteImgList = document.querySelectorAll('.deleteImgList');
+        deleteImg = document.querySelectorAll('.deleteImg');
+
+        if ( isNight === true ) {
+            deleteImgList.forEach(el => {
+                el.style.backgroundColor = '#ffffff';
+                el.style.color = 'black';
+            });
+            deleteImg.forEach(el => {
+                el.style.background = 'url(./sources/ICON_plusDay.svg)';
+            });
+        } else {
+            deleteImgList.forEach(el => {
+                el.style.backgroundColor = '#111111';
+                el.style.color = 'white';
+            });
+            deleteImg.forEach(el => {
+                el.style.background = 'url(./sources/ICON_plusNight.svg)';
+            });
+        }
+
+        deleteImgListDiv.addEventListener('click', function() {
+            removeMeshById(uniqueId);
+        });
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const texture = new THREE.Texture(img);
+
+                const aspectRatio = img.width / img.height;
+                const scale = window.innerWidth <= 600 ? 0.3 : 0.4;
+                const width = aspectRatio * scale;
+                const height = 1 * scale;
+                const geometry = new THREE.PlaneGeometry(width, height);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: new THREE.Color('#ffffff'),
+                    map: texture,
+                    reflectivity: 0,
+                    lightMapIntensity : 0  });
+                    
+                texture.colorSpace = THREE.SRGBColorSpace;
+                texture.needsUpdate = true;
+    
+                const mesh = new THREE.Mesh(geometry, material);
+
+                // 물리 바디 추가
+                const radius = (Math.sqrt(width**2 + height**2))/2;
+                const shape = new CANNON.Sphere(radius);
+
+                const body = new CANNON.Body({ mass: 1 });
+                body.addShape(shape);
+
+                mesh.position.set(0, 0, zPos/2);
+                body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+
+                // 메시가 항상 카메라를 바라보도록 설정
+                mesh.lookAt(camera.position);
+
+                world.addBody(body);
+                mesh.body = body;
+                scene.add(mesh);
+                imgMeshes.push({ id: uniqueId, mesh: mesh});
+            }
+            img.src = e.target.result; 
+        }
+        reader.readAsDataURL(file);
+    }
+    chooseFile.value = '';
+}
+
+function removeMeshById(id) {
+    // imgMeshes 배열에서 해당 ID를 가진 객체 찾기
+    const meshInfoIndex = imgMeshes.findIndex(meshInfo => meshInfo.id === id);
+    if (meshInfoIndex !== -1) {
+        const meshInfo = imgMeshes[meshInfoIndex];
+        scene.remove(meshInfo.mesh); // Scene에서 mesh 제거
+        if (meshInfo.mesh.body) {
+            world.removeBody(meshInfo.mesh.body); // Cannon.js world에서 body 제거 (필요한 경우)
+        }
+        imgMeshes.splice(meshInfoIndex, 1); // imgMeshes 배열에서 해당 객체 삭제
+
+        // HTML에서 파일 이름 div 제거
+        const fileNameDiv = document.getElementById(id);
+        if (fileNameDiv) {
+            fileList.removeChild(fileNameDiv);
+        }
+    }
+}
+
+const textInput = document.getElementById('textInput');
+
 function updateScene() {
     // 현재 Scene 내의 모든 Mesh 삭제
     meshes.forEach(mesh => {
@@ -373,12 +497,15 @@ function updateScene() {
     });
     meshes.length = 0; // Mesh 배열 비우기
 
-    if (bezierCnt === 0) {
-        scene.remove(mesh);
-        if (mesh.body) {
-            world.removeBody(mesh.body);
+    textInput.addEventListener('keyup', function() {
+        if (bezierCnt === 0) {
+            scene.remove(mesh);
+            if (mesh.body) {
+                world.removeBody(mesh.body);
+            }
         }
-    }
+    });
+
 
     for (let i = 0; i < bezierCnt + extraCnt; i++) {
         addMesh();
@@ -419,25 +546,30 @@ function cubicBezier(t, p0, p1, p2, p3) {
 }
 
 const random = document.getElementById('random');
-let ranChecked = true;
+let isranChecked = true;
 
 random.addEventListener('click', function() {
-    if (ranChecked === true) {
+    if (isranChecked === true) {
         random.style.opacity = 0.3;
-        ranChecked = false;
+        isranChecked = false;
     } else {
         random.style.opacity = 1.0;
-        ranChecked = true;
+        isranChecked = true;
     }
 });
 
 function animateMeshes() {
     const currentTime = (new Date()).getTime() / 500;
 
-    if (ranChecked === true && (Math.abs(pointPos - 0.99) < 0.01)) {
+    if (isranChecked === true && (Math.abs(pointPos - 0.99) < 0.01)) {
         soundPlay();
         updateScene();
         ranTextAlign();
+        random.classList.add('rotate');
+        setTimeout(() => {
+            random.classList.remove('rotate');
+        }, 1000);
+
     }
 
 
@@ -484,8 +616,6 @@ function animateMeshes() {
                 mesh.scale.set(scale, scale, scale);
             }
         }
-        // mesh.rotation.x += 0.01;
-        // mesh.rotation.y += 0.01;
         mesh.rotation.z += 0.01;
 
         const quaternion = new THREE.Quaternion();
@@ -582,6 +712,9 @@ function animate() {
         mesh.position.copy(mesh.body.position);
         mesh.quaternion.copy(mesh.body.quaternion);
     });
+    imgMeshes.forEach(function(imgMesh) {
+        imgMesh.mesh.position.copy(imgMesh.mesh.body.position);
+    });
     animateMeshes();
 
     // cannonDebugger.update(); 
@@ -594,20 +727,17 @@ const dayNight = document.getElementById('dayNight');
 
 const boundBox = document.getElementById('boundBox');
 const bg = document.getElementById('bg');
-const textInput = document.getElementById('textInput');
 const controlPanel = document.getElementById('controlPanel');
 const threeOpacity = document.getElementById('threeOpacity');
 const textOpacity = document.getElementById('textOpacity');
-const bezierCanvas = document.getElementById('bezierCanvas')
-const panelAll = document.getElementById('panelAll');
+const bezierCanvas = document.getElementById('bezierCanvas');
 
 const cube = document.getElementById('cube');
 const saveImg = document.getElementById('saveImg');
 const settings = document.getElementById('settings');
-const rangeInput = document.querySelectorAll ('.rangeInput');
+const rangeInput = document.querySelectorAll('.rangeInput');
 const setCircle = document.getElementById('setCircle');
-
-let isNight = true;
+const imgBtn = document.querySelectorAll('.imgBtn');
 
 dayNight.addEventListener('click', function() {
     if ( isNight === true ) {
@@ -625,7 +755,17 @@ dayNight.addEventListener('click', function() {
         controlPanel.style.backgroundColor ='rgba(0, 0, 0, 0.66)';
         setCircle.style.border = controlPanel.style.border;
         setCircle.style.backgroundColor = controlPanel.style.backgroundColor;
-        
+        imgBtn.forEach(el => {
+            el.style.backgroundColor = '#ffffff';
+            el.style.color = 'black';
+        });
+        deleteImgList.forEach(el => {
+            el.style.backgroundColor = '#111111';
+            el.style.color = 'white';
+        });
+        deleteImg.forEach(el => {
+            el.style.background = 'url(./sources/ICON_plusNight.svg)';
+        });
         dayNight.src = 'sources/ICON_dayMode.svg';
         random.src = 'sources/ICON_ranNight.svg';
         minusCnt.src = 'sources/ICON_minusNight.svg';
@@ -653,6 +793,17 @@ dayNight.addEventListener('click', function() {
         controlPanel.style.backgroundColor ='rgba(255, 255, 255, 0.66)';
         setCircle.style.border = controlPanel.style.border;
         setCircle.style.backgroundColor = controlPanel.style.backgroundColor;
+        imgBtn.forEach(el => {
+            el.style.backgroundColor = '#111111';
+            el.style.color = 'white';
+        });
+        deleteImgList.forEach(el => {
+            el.style.backgroundColor = '#ffffff';
+            el.style.color = 'black';
+        });
+        deleteImg.forEach(el => {
+            el.style.background = 'url(./sources/ICON_plusDay.svg)';
+        });
 
         dayNight.src = 'sources/ICON_nightMode.svg';
         random.src = 'sources/ICON_ranDay.svg';
