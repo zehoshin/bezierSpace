@@ -20,9 +20,9 @@ let extraCnt, radius, composer;
 
 function genRadius() {
     if ( bezierCnt + extraCnt > 5 ) {
-        radius = window.innerWidth <= 600 ? 0.3 : 0.5;
+        radius = window.innerWidth <= 900 ? 0.3 : 0.5;
     } else {
-        radius = window.innerWidth <= 600 ? 0.1 : 0.2;
+        radius = window.innerWidth <= 900 ? 0.1 : 0.2;
     }
 }
 
@@ -51,7 +51,7 @@ function init() {
 
     const outputPass = new OutputPass();
 
-    composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
+    composer = window.innerWidth <= 900 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
     // composer = new EffectComposer( renderer );
     composer.addPass( renderScene );
     composer.addPass( outputPass );
@@ -231,18 +231,18 @@ function addMesh() {
     const position = getRandomPosition(radius);
     const materialIndex = Math.floor(Math.random() * materials.length);
     
-    let scaleFactor = window.innerWidth <= 600 ? 0.2 : 0.4;
+    let scaleFactor = window.innerWidth <= 900 ? 0.2 : 0.4;
     let ranSizeX = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2
     let ranSizeY = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2
     let ranSizeZ = Math.random() * 0.7 + 0.5; // 0.5 ~ 1.2 
     let ranSizeH = Math.random() * 0.09 + 0.01; // 0.01 ~ 0.10 
     let ranSizeW = Math.random() * 0.4 + 0.2; // 0.2 ~ 0.6
-    let ranSizeH2 = window.innerWidth <= 600 ? Math.random() * 0.3 + 0.3 : Math.random() * 0.7 + 0.5; 
+    let ranSizeH2 = window.innerWidth <= 900 ? Math.random() * 0.3 + 0.3 : Math.random() * 0.7 + 0.5; 
 
     if (materials[materialIndex] === 'wireFrame') {
         segments = 10;
     } else {
-        if ( window.innerWidth > 600 ) {
+        if ( window.innerWidth > 900 ) {
             segments = 60;
         } else {
             segments = 30;
@@ -267,7 +267,7 @@ function addMesh() {
         const lineGeometry = new LineSegmentsGeometry().fromEdgesGeometry(edges);
         const lineMaterial = new LineMaterial({
             color: ranNeon(),
-            linewidth: window.innerWidth <= 600 ? 2 : 2.5, 
+            linewidth: window.innerWidth <= 900 ? 2 : 2.5, 
         });
 
         const line = new Line2(lineGeometry, lineMaterial);
@@ -420,7 +420,7 @@ function loadFile(event) {
                 const texture = new THREE.Texture(img);
 
                 const aspectRatio = img.width / img.height;
-                const scale = window.innerWidth <= 600 ? 0.3 : 0.4;
+                const scale = window.innerWidth <= 900 ? 0.3 : 0.4;
                 const width = aspectRatio * scale;
                 const height = 1 * scale;
                 const geometry = new THREE.PlaneGeometry(width, height);
@@ -577,7 +577,7 @@ function animateMeshes() {
         }
         const animation = mesh.animation;
         
-        if (window.innerWidth > 600 && (Math.abs(pointPos - 0.99) < 0.01) && animation.animationPhase === 0) {
+        if (window.innerWidth > 900 && (Math.abs(pointPos - 0.99) < 0.01) && animation.animationPhase === 0) {
             animation.isAnimating = true;
             animation.animationPhase = 1;
             animation.animationStartTime = currentTime;
@@ -732,6 +732,7 @@ const settings = document.getElementById('settings');
 const rangeInput = document.querySelectorAll('.rangeInput');
 const setCircle = document.getElementById('setCircle');
 const imgBtn = document.querySelectorAll('.imgBtn');
+const aboutIcon = document.getElementById('aboutIcon');
 
 dayNight.addEventListener('click', function() {
     if ( isNight === true ) {
@@ -770,6 +771,7 @@ dayNight.addEventListener('click', function() {
         rangeInput.forEach(el => el.style.accentColor = 'white');
         num.style.color = 'white';
         num.style.fontWeight = '700';
+        aboutIcon.src = 'sources/ICON_aboutNight.svg';
 
         isNight = false;
     } else {
@@ -809,6 +811,7 @@ dayNight.addEventListener('click', function() {
         rangeInput.forEach(el => el.style.accentColor = '#111111');
         num.style.color = '#111111';
         num.style.fontWeight = '800';
+        aboutIcon.src = 'sources/ICON_aboutDay.svg';
 
         isNight = true;
     }
@@ -852,7 +855,6 @@ textOpacity.addEventListener('input', function() {
 
 });
 
-const aboutIcon = document.getElementById('aboutIcon');
 const aboutDiv = document.getElementById('aboutDiv');
 const allWithoutAbout = document.getElementById('allWithoutAbout');
 
@@ -860,10 +862,16 @@ let isAboutNone = true;
 
 aboutIcon.addEventListener('click', function() {
     if ( isAboutNone === true ) {
+        aboutIcon.src = 'sources/ICON_closeNight.svg';
         aboutDiv.style.display = 'flex';
-        allWithoutAbout.style.filter = 'blur(2px)';
+        allWithoutAbout.style.filter = 'blur(3px)';
         isAboutNone = false;
     } else {
+        if ( isNight === true ) {
+            aboutIcon.src = 'sources/ICON_aboutDay.svg';
+        } else {
+            aboutIcon.src = 'sources/ICON_aboutNight.svg';
+        }
         aboutDiv.style.display = 'none';
         allWithoutAbout.style.filter = 'blur(0px)';
         isAboutNone = true;

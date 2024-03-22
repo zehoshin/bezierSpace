@@ -323,7 +323,7 @@ function ranNeon() {
 }
 
 function ranLineWidth() {
-    if (window.innerWidth <= 600) {
+    if (window.innerWidth <= 900) {
         return Math.floor(Math.random() * 2) + 3;
     } else {
         return Math.floor(Math.random() * 3) + 5;
@@ -342,7 +342,7 @@ function ranShape() {
 }
 
 function ranPoint(circleNum, refPoint) {
-    let MAX_DISTANCE = window.innerWidth <= 600 ? 250 : 750;
+    let MAX_DISTANCE = window.innerWidth <= 900 ? 250 : 750;
     let minY = 0;
     let maxY = window.innerHeight;
 
@@ -589,7 +589,7 @@ function redraw() {
 let animationFrameId = null; 
 
 function easeInOut(currentPoint) {
-    if (window.innerWidth <= 600) {
+    if (window.innerWidth <= 900) {
         return 0.9 + 1.5 * Math.sin(currentPoint * Math.PI);
     } else {
         return 0.9 + 2.1 * Math.sin(currentPoint * Math.PI);
