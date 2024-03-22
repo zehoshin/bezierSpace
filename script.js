@@ -857,6 +857,7 @@ textOpacity.addEventListener('input', function() {
 
 const aboutDiv = document.getElementById('aboutDiv');
 const allWithoutAbout = document.getElementById('allWithoutAbout');
+const iconText = document.getElementById('iconText');
 
 let isAboutNone = true;
 
@@ -864,6 +865,7 @@ aboutIcon.addEventListener('click', function() {
     if ( isAboutNone === true ) {
         aboutIcon.src = 'sources/ICON_closeNight.svg';
         aboutDiv.style.display = 'flex';
+        iconText.style.display = 'flex';
         allWithoutAbout.style.filter = 'blur(3px)';
         isAboutNone = false;
     } else {
@@ -873,6 +875,7 @@ aboutIcon.addEventListener('click', function() {
             aboutIcon.src = 'sources/ICON_aboutNight.svg';
         }
         aboutDiv.style.display = 'none';
+        iconText.style.display = 'none';
         allWithoutAbout.style.filter = 'blur(0px)';
         isAboutNone = true;
     }
