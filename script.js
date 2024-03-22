@@ -420,7 +420,7 @@ function loadFile(event) {
                 const texture = new THREE.Texture(img);
 
                 const aspectRatio = img.width / img.height;
-                const scale = window.innerWidth <= 900 ? 0.3 : 0.4;
+                const scale = window.innerWidth <= 900 ? 0.35 : 0.4;
                 const width = aspectRatio * scale;
                 const height = 1 * scale;
                 const geometry = new THREE.PlaneGeometry(width, height);
@@ -442,7 +442,7 @@ function loadFile(event) {
                 const body = new CANNON.Body({ mass: 1 });
                 body.addShape(shape);
 
-                mesh.position.set(0, 0, zPos/2);
+                mesh.position.set(0, 0, -1.4);
                 body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
 
                 // 메시가 항상 카메라를 바라보도록 설정
@@ -877,3 +877,62 @@ aboutIcon.addEventListener('click', function() {
         isAboutNone = true;
     }
 });
+
+function underHeight700() {
+    const headline = document.querySelectorAll('.headline');
+    const content = document.querySelectorAll('.content');
+    const hyperlink = document.querySelectorAll('.hyperlink');
+    const aboutContent = document.querySelectorAll('.aboutContent');
+    const iconText = document.getElementById('iconText');
+
+    if (window.innerHeight < 700) {
+        headline.forEach(el => {
+            el.style.fontSize = '26px';
+        });
+        content.forEach(el => {
+            el.style.fontSize = '16px';
+        });
+        hyperlink.forEach(el => {
+            el.style.fontSize = '14px';
+        });
+        aboutContent.forEach(el => {
+            el.style.margin = '20px 0px 10px 0px';
+        });
+        iconText.style.fontSize = '14px';
+        iconText.style.margin = '10px 0px 20px 0px';
+    } else if ( window.innerHeight >= 700 && window.innerWidth <= 900 ) {
+        headline.forEach(el => {
+            el.style.fontSize = '36px';
+        });
+        content.forEach(el => {
+            el.style.fontSize = '20px';
+        });
+        hyperlink.forEach(el => {
+            el.style.fontSize = '15px';
+        });
+        aboutContent.forEach(el => {
+            el.style.margin = '40px 0px 20px 0px';
+        });
+        iconText.style.fontSize = '16px';
+        iconText.style.margin = '20px 0px 40px 0px';
+    } else if ( window.innerHeight >= 700 && window.innerWidth > 900 ) {
+        headline.forEach(el => {
+            el.style.fontSize = '72px';
+        });
+        content.forEach(el => {
+            el.style.fontSize = '28px';
+        });
+        hyperlink.forEach(el => {
+            el.style.fontSize = '18px';
+        });
+        aboutContent.forEach(el => {
+            el.style.margin = '40px 0px 20px 0px';
+        });
+        iconText.style.fontSize = '16px';
+        iconText.style.margin = '20px 0px 40px 0px';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", underHeight700);
+window.addEventListener('resize', underHeight700);
+
