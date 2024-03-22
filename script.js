@@ -50,7 +50,8 @@ function init() {
 
     const outputPass = new OutputPass();
 
-    composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
+    // composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
+    composer = new EffectComposer( renderer );
     composer.addPass( renderScene );
     composer.addPass( outputPass );
     composer.setSize( window.innerWidth, window.innerHeight );
