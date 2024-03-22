@@ -44,26 +44,18 @@ init();
 
 function init() {
     const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 8, type: THREE.HalfFloatType } );
+    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 2, type: THREE.HalfFloatType } );
 
     const renderScene = new RenderPass( scene, camera );
-
-    const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-    bloomPass.threshold = 0.1;
-    bloomPass.strength = 0.14;
-    bloomPass.radius = 1.5;
 
     const outputPass = new OutputPass();
 
     composer = window.innerWidth <= 600 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
     composer.addPass( renderScene );
-    // composer.addPass( bloomPass );
     composer.addPass( outputPass );
     composer.setSize( window.innerWidth, window.innerHeight );
     window.addEventListener( 'resize', onWindowResize );
 }
-
-let panelAnimation = true;
 
 function onWindowResize() {
 
