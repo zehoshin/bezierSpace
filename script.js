@@ -887,10 +887,10 @@ function underHeight700() {
 
     if (window.innerHeight < 700) {
         headline.forEach(el => {
-            el.style.fontSize = '26px';
+            el.style.fontSize = '30px';
         });
         content.forEach(el => {
-            el.style.fontSize = '16px';
+            el.style.fontSize = '17px';
         });
         hyperlink.forEach(el => {
             el.style.fontSize = '14px';
