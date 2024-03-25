@@ -1,78 +1,42 @@
 @media screen and (max-width: 900px) {
-    .textDiv {
-        font-weight: 900;
-        font-size: 36pt;
-        line-height: 1.2;
-        margin-bottom: 5px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
     .textCircle {
         width: 10px;
         height: 10px;    
         transform: translate(5px, 26px);
     }
     #boundBox {
-        width: 84vw;
+        font-weight: 900;
+        font-size: 36pt;
+        line-height: 1.2;
+        margin-bottom: 5px;
+        padding-inline: 10px;
     }
-    #exScroll {
-        width: 15px;
-        right: 20px;
+    #container {
+        padding-inline: 30px;
     }
     .aboutContent {
         width: 320px;
     }
-    
-    .headline {
-        font-size: 36px;
-    }
-    
-    .content {
-        font-size: 20px;
-        line-height: 1.6;
-    }
-    
-    .hyperlink {
-        font-size: 15px;
-    }
 }
 @media screen and (min-width: 900px) {
-    .textDiv {
-        font-weight: 700;
-        font-size: 100pt;
-        line-height: 1.2;
-        letter-spacing: -3px;
-        margin-bottom: 10px;
-        padding-left: 50px;
-        padding-right: 50px;    
-    }
     .textCircle {
         width: 20px;
         height: 20px;    
         transform: translateY(80px);
     }
     #boundBox {
-        width: 75vw;
+        font-weight: 700;
+        font-size: 100pt;
+        line-height: 1.2;
+        letter-spacing: -3px;
+        margin-bottom: 10px;
+        padding-inline: 50px;
     }
-    #exScroll {
-        width: 20px;
-        right: 20px;
+    #container {
+        padding-inline: 200px;
     }
     .aboutContent {
         width: 820px;
-    }
-    
-    .headline {
-        font-size: 72px;
-    }
-    
-    .content {
-        font-size: 28px;
-        line-height: 1.54;
-    }
-    
-    .hyperlink {
-        font-size: 18px;
     }
 }
 
@@ -131,6 +95,8 @@ body {
     position: absolute;
     cursor: pointer;
     opacity: 0.5;
+    width: 20px;
+    right: 20px;
 }
 
 .textInput {
@@ -154,6 +120,7 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
@@ -208,6 +175,7 @@ body {
     overflow: hidden;
     z-index: -1;
     filter: saturate(1.3);
+    width: 100%;
 }
 
 #controlPanel {
@@ -356,7 +324,7 @@ body {
 }
 
 .deleteImg {
-    background: url(./sources/ICON_plusDay.svg);
+    background: url(./sources/icon/ICON_plusDay.svg);
     background-repeat: no-repeat;
     width: 15px;
     height: 15px;

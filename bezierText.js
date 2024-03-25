@@ -1,33 +1,80 @@
 import { Bezier } from "./bezier.js";
 
-
 //텍스트 div 생성 --------------------------------------------------------
 const textInput = document.getElementById('textInput');
 const fakeTextInput = document.getElementById('fakeTextInput');
-
 const container = document.getElementById('container');
 const canvas = document.getElementById('bezierCanvas');
+const tempoRange = document.getElementById('tempo');
+const exScroll = document.getElementById('exScroll');
 
 const ctx = canvas.getContext('2d');
 const widthPixelRatio = window.innerWidth * window.devicePixelRatio;
 const heightPixelRatio = window.innerHeight * window.devicePixelRatio;
-let bezierCnt;
-let pointPos;
+const endXFactor = -20;
+const textAlignMap = {};
+const DRAG_THRESHOLD = 0.1;
+const OVERSHOOT_DISTANCE = 0.05;
+const ELASTICITY = 0.2;
+const ANIMATION_DURATION = 10;
+
+let bezierCnt, pointPos;
 let allControlPoints = [];
 let seconds = 3;
+let isDragging = false;
+let scrollUpd = false;
+let animationFrameId = null; 
+let dragging = false;
+let draggingPoint = null; // 드래그 중인 제어점 정보
 
-const tempoRange = document.getElementById('tempo');
-tempoRange.addEventListener('input', function() {
-    let tempoValue = tempoRange.value;
-    if (tempoValue == 1) {
-        seconds = 1.01;
-    } else {
-    seconds = tempoValue;
-    }
-    const tempoText = document.getElementById('tempoText')
-    tempoText.innerHTML = parseFloat(tempoValue).toFixed(1) + 'sec';
-    updateSpeedForAllCurves();
-});
+init();
+export { bezierCnt, pointPos, ranNeon, ranTextAlign };
+
+function init() {
+    tempoRange.addEventListener('input', function() {
+        let tempoValue = tempoRange.value;
+        if (tempoValue == 1) {
+            seconds = 1.01;
+        } else {
+        seconds = tempoValue;
+        }
+        const tempoText = document.getElementById('tempoText')
+        tempoText.innerHTML = parseFloat(tempoValue).toFixed(1) + 'sec';
+        updateSpeedForAllCurves();
+    });
+    
+    setTimeout(typeText, 500);
+    onTextInput(); // 초기 div 생성 및 화면 표시
+    
+    textInput.addEventListener('keyup', function() {
+        fakeTextInput.value = "";
+    });
+    
+    textInput.addEventListener('keyup', onTextInput);
+    
+    document.body.addEventListener('wheel', handleScroll);
+    container.addEventListener('touchmove', handleScroll); 
+    exScroll.addEventListener('mousedown', startScroll);
+    exScroll.addEventListener('touchstart', startScroll);
+    
+    window.addEventListener('resize', function() {
+        textJustify();
+        updScrollShape();
+        updScrollPos();
+        updBezierCurvePos();
+    });
+    
+    // 내용 변경 감지 및 스크롤바 업데이트
+    const observer = new MutationObserver(function() {
+        updScrollShape();
+        updScrollPos();
+    });
+    observer.observe(container, { childList: true, subtree: true, attributes: true, characterData: true });
+    
+    updScrollShape();
+    animate();
+    addEventListeners();
+};
 
 function updateSpeedForAllCurves() {
     const newSpeed = setSpeed();
@@ -35,10 +82,6 @@ function updateSpeedForAllCurves() {
         curve.speed = newSpeed;
     });
 }
-
-
-const endXFactor = -20;
-const textAlignMap = {};
 
 function textJustify() {
     if (container.scrollHeight > container.clientHeight) {
@@ -154,15 +197,7 @@ function typeText() {
     });
 }
 
-typeText();
 
-onTextInput(); // 초기 div 생성 및 화면 표시
-
-textInput.addEventListener('keyup', function() {
-    fakeTextInput.value = "";
-});
-
-textInput.addEventListener('keyup', onTextInput);
 
 function ranTextAlign() {
     document.querySelectorAll('.textDiv').forEach((div, index) => {
@@ -176,11 +211,6 @@ function ranTextAlign() {
 }
 
 //스크롤바-------------------------------------------------------------
-const exScroll = document.getElementById('exScroll');
-let isDragging = false;
-let scrollUpd = false;
-
-// 스크롤 이벤트 최적화
 container.addEventListener('scroll', function() {
     if (!scrollUpd) {
         requestAnimationFrame(function() {
@@ -190,10 +220,6 @@ container.addEventListener('scroll', function() {
         scrollUpd = true;
     }
 });
-
-// 마우스 휠과 터치 스크롤 동작에 대한 핸들링
-document.body.addEventListener('wheel', handleScroll); // 마우스 휠 이벤트
-container.addEventListener('touchmove', handleScroll); // 터치 스크롤 이벤트
 
 function handleScroll(e) {
     const scrollAmount = e.deltaY || e.touches[0].pageY; // 마우스 휠 또는 터치 이동 거리
@@ -208,7 +234,7 @@ function handleScroll(e) {
         container.scrollTop = maxScroll;
     }
 
-    updScrollPos(); // 스크롤 위치 업데이트 함수
+    updScrollPos();
 }
 
 // 스크롤바 모양과 위치 업데이트 함수들
@@ -224,10 +250,6 @@ function updScrollPos() {
     const topPosition = scrollPer * (container.clientHeight - exScroll.offsetHeight);
     exScroll.style.top = `${topPosition}px`;
 }
-
-// 드래그 이벤트 추가 (마우스 및 터치 지원)
-exScroll.addEventListener('mousedown', startScroll);
-exScroll.addEventListener('touchstart', startScroll);
 
 function startScroll(e) {
     isDragging = true;
@@ -259,22 +281,6 @@ function startScroll(e) {
 
     e.preventDefault();
 }
-
-window.addEventListener('resize', function() {
-    textJustify();
-    updScrollShape();
-    updScrollPos();
-    updBezierCurvePos();
-});
-
-// 내용 변경 감지 및 스크롤바 업데이트
-const observer = new MutationObserver(function() {
-    updScrollShape();
-    updScrollPos();
-});
-observer.observe(container, { childList: true, subtree: true, attributes: true, characterData: true });
-
-updScrollShape();
 
 //Bezier Curve 생성-----------------------------------------------------
 // 랜덤
@@ -540,7 +546,6 @@ function genBezierCurve() {
     // console.log(allControlPoints);
 }
 
-
 function updBezierCurvePos() {
     allControlPoints.forEach(function(curve) {
         const startPos = getStartEndPos(curve.startCircleNum);
@@ -586,8 +591,6 @@ function redraw() {
 }
 
 //원형 애니메이션---------------------------------------
-let animationFrameId = null; 
-
 function easeInOut(currentPoint) {
     if (window.innerWidth <= 900) {
         return 0.9 + 1.5 * Math.sin(currentPoint * Math.PI);
@@ -653,22 +656,9 @@ function animate() {
     });
     // 다음 프레임 요청
     animationFrameId = requestAnimationFrame(animate);
-    
 }
 
-animate();
-export { bezierCnt, pointPos, ranNeon, ranTextAlign }
-
-
 //마우스 드래그 이벤트---------------------------------------------
-let dragging = false;
-let draggingPoint = null; // 드래그 중인 제어점 정보
-
-const DRAG_THRESHOLD = 0.1;
-const OVERSHOOT_DISTANCE = 0.05;
-const ELASTICITY = 0.2;
-const ANIMATION_DURATION = 10;
-
 // 드래그 시작 검사
 function checkDragStart(x, y) {
     allControlPoints.forEach((curve, curveIndex) => {
@@ -739,8 +729,6 @@ function endDrag(e) {
     animate();
 }
 
-addEventListeners();
-
 // Elastic 계산
 function calElastic() {
     const { curveIndex, pointIndex } = draggingPoint;
@@ -806,3 +794,4 @@ function withElasticity(curveIndex, pointIndex, targetX, targetY, overshootX, ov
     };
     controlPoint.animationFrameId = requestAnimationFrame(animateElastic);
 }
+

@@ -3,64 +3,168 @@ import * as CANNON from './cannon-es.js';
 import { Line2 } from "./lines/Line2.js";
 import { LineMaterial } from "./lines/LineMaterial.js";
 import { LineSegmentsGeometry } from "./lines/LineSegmentsGeometry.js";
-
-import { EffectComposer } from './postprocessing/EffectComposer.js';
-import { RenderPass } from './postprocessing/RenderPass.js';
-import { UnrealBloomPass } from './postprocessing/UnrealBloomPass.js';
-import { OutputPass } from './postprocessing/OutputPass.js';
-
 import { bezierCnt, pointPos, ranNeon, ranTextAlign } from './bezierText.js';
 import CannonDebugger from './cannon-es-debugger.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 7;
-
-let extraCnt, radius, composer; 
-
-function genRadius() {
-    if ( bezierCnt + extraCnt > 5 ) {
-        radius = window.innerWidth <= 900 ? 0.3 : 0.5;
-    } else {
-        radius = window.innerWidth <= 900 ? 0.1 : 0.2;
-    }
-}
-
 const light = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
-scene.add( light );
-
 const renderer = new THREE.WebGLRenderer( { 
     antialias: true,
     alpha: true, 
     preserveDrawingBuffer: true,
     powerPreference: "high-performance"  } ); 
-renderer.setClearColor( 0x000000, 0 );
-renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
-renderer.setSize( window.innerWidth, window.innerHeight );
 const threeCanvas = document.getElementById('threeCanvas');
+const world = new CANNON.World();
+const cannonDebugger = new CannonDebugger( scene, world );
 
-threeCanvas.appendChild( renderer.domElement );
+let extraCnt, radius, gravityResetTimer, mesh, segments, audio, currentAudio, geometry, material, ranScale, gravityPar; 
+
+const exScroll = document.getElementById('exScroll');
+const plusCnt = document.getElementById('plusCnt');
+const minusCnt = document.getElementById('minusCnt');
+const num = document.getElementById('num');
+const chooseFile = document.getElementById('chooseFile');
+const fileList = document.getElementById('fileList');
+const textInput = document.getElementById('textInput');
+const gravityForce = document.getElementById('gravityForce');
+const camZpos = document.getElementById('camZpos');
+
+let isDragging = false;
+
+const textureLoader = new THREE.CubeTextureLoader();
+const envSky = textureLoader.load([
+    './sources/cubeMap/sky/px.jpg',
+    './sources/cubeMap/sky/nx.jpg',
+    './sources/cubeMap/sky/py.jpg',
+    './sources/cubeMap/sky/ny.jpg',
+    './sources/cubeMap/sky/pz.jpg',
+    './sources/cubeMap/sky/nz.jpg'
+])
+
+const fake_Color = new THREE.TextureLoader().load( "" );
+const fake_Normal = new THREE.TextureLoader().load( "" );
+const fake_Roughness = new THREE.TextureLoader().load( "" );
+
+const materials = [
+    'basicColor',
+    'basicColor',
+    'basicColor',
+    'basicColor',
+    'wireFrame',
+    'metal',
+];
+
+const meshes = [];
+const zPos = -2.4
+let scaleTo = -0.15;
+
+const imgMeshes = [];
+let deleteImgList = [];
+let deleteImg = [];
+
+const Ding01 = new Audio('./sources/sound/Ding01.mp3');
+const Ding02 = new Audio('./sources/sound/Ding02.mp3');
+const Ding03 = new Audio('./sources/sound/Ding03.mp3');
+const Ding04 = new Audio('./sources/sound/Ding04.mp3');
+const audios = [Ding01, Ding02, Ding03, Ding04];
+const growDuration = 0.24;
+const shrinkDuration = 0.74;
+
+let boundaryWalls = [];
+let lastBezierCnt = -1;
 
 init();
+animate();
 
 function init() {
-    const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-    const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 4, type: THREE.HalfFloatType } );
+    //렌더 세팅
+    renderer.setClearColor( 0x000000, 0 );
+    renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    
+    camera.position.z = 7;
+    scene.add( light );
 
-    const renderScene = new RenderPass( scene, camera );
+    //물리 세팅
+    world.gravity.set(0, 0, 0);
+    world.broadphase = new CANNON.SAPBroadphase(world);
+    world.solver = new CANNON.GSSolver();
+    world.solver.iterations = 10;
+    world.solver.tolerance = 0.01;
 
-    const outputPass = new OutputPass();
+    //개수 계산
+    extraCnt = Number(num.innerHTML);
+    plusCnt.addEventListener('click', function() {
+        extraCnt += 1;
+        num.innerHTML = bezierCnt + extraCnt;
+        addMesh();
+    });
+    minusCnt.addEventListener('click', function() {
+        if (bezierCnt + extraCnt > 0) {
+            extraCnt -= 1;
+            num.innerHTML = bezierCnt + extraCnt;
+            removeMesh();
+        }
+    });
 
-    composer = window.innerWidth <= 900 ? new EffectComposer( renderer ) : new EffectComposer( renderer, renderTarget );
-    // composer = new EffectComposer( renderer );
-    composer.addPass( renderScene );
-    composer.addPass( outputPass );
-    composer.setSize( window.innerWidth, window.innerHeight );
+    //파일 로딩
+    chooseFile.addEventListener('input', loadFile);
+
+    //UI
+    dayNight.addEventListener('click', function() {
+        changeTheme();
+        changeImgListUI();
+    });
+
+    //캔버스 세팅
+    threeCanvas.appendChild( renderer.domElement );
     window.addEventListener( 'resize', onWindowResize );
-}
+    window.addEventListener( 'wheel', onWindowScroll );
+    
+    exScroll.addEventListener('mousedown', startScroll);
+    exScroll.addEventListener('touchstart', startScroll);
+
+    createBoundary(1, 1, 5);
+    camZpos.addEventListener('input', function() {
+        camera.position.z = camZpos.value;
+        createBoundary(1, 1, 5);
+    });
+    gravityPar = 0.1;
+    gravityForce.addEventListener('input', function() {
+        gravityPar = gravityForce.value / 10;
+        document.getElementById('grabityText').innerHTML = gravityForce.value * 5 + '%';
+    });
+    
+};
+
+function animate() {
+    requestAnimationFrame(animate);
+   
+    applyRadialForces();
+    if (bezierCnt !== lastBezierCnt) {
+        updateScene();
+        lastBezierCnt = bezierCnt;
+    }
+
+    // 물리 업데이트
+    world.step(1 / 60);
+
+    // Mesh를 물리 바디 상태로 업데이트
+    meshes.forEach(mesh => {
+        mesh.position.copy(mesh.body.position);
+        mesh.quaternion.copy(mesh.body.quaternion);
+    });
+    imgMeshes.forEach(function(imgMesh) {
+        imgMesh.mesh.position.copy(imgMesh.mesh.body.position);
+    });
+    animateMeshes();
+
+    // cannonDebugger.update(); 
+    renderer.render( scene, camera );
+};
 
 function onWindowResize() {
-
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -70,25 +174,9 @@ function onWindowResize() {
     createBoundary(1, 1, 5);
 
     renderer.setSize( width, height );
-    composer.setSize( width, height );
-   
-}
+};
 
-// cannon-es.js 물리 세계 생성
-const world = new CANNON.World();
-world.gravity.set(0, 0, 0);
-world.broadphase = new CANNON.SAPBroadphase(world);
-world.solver = new CANNON.GSSolver();
-
-world.solver.iterations = 10;
-world.solver.tolerance = 0.01;
-
-let cannonDebugger = new CannonDebugger( scene, world );
-
-//중력 이벤트----------------------------------------------------------
-let gravityResetTimer;
-
-window.addEventListener('wheel', function(event) {
+function onWindowScroll() {
     clearTimeout(gravityResetTimer);
     if (event.deltaY < 0) {
         world.gravity.set(0, -0.8, 0);
@@ -98,13 +186,7 @@ window.addEventListener('wheel', function(event) {
     gravityResetTimer = setTimeout(() => {
         world.gravity.set(0, 0, 0);
     }, 1000);
-});
-
-const exScroll = document.getElementById('exScroll');
-let isDragging = false;
-
-exScroll.addEventListener('mousedown', startScroll);
-exScroll.addEventListener('touchstart', startScroll);
+};
 
 function startScroll(e) {
     isDragging = true;
@@ -148,33 +230,6 @@ function startScroll(e) {
     e.preventDefault();
 }
 
-//MESH----------------------------------------------------------
-const textureLoader = new THREE.CubeTextureLoader();
-const envSky = textureLoader.load([
-    './sources/cubeMap/sky/px.jpg',
-    './sources/cubeMap/sky/nx.jpg',
-    './sources/cubeMap/sky/py.jpg',
-    './sources/cubeMap/sky/ny.jpg',
-    './sources/cubeMap/sky/pz.jpg',
-    './sources/cubeMap/sky/nz.jpg'
-])
-
-const fake_Color = new THREE.TextureLoader().load( "" );
-const fake_Normal = new THREE.TextureLoader().load( "" );
-const fake_Roughness = new THREE.TextureLoader().load( "" );
-
-const materials = [
-    // '2dColor',
-    // '2dColor',
-    'basicColor',
-    'basicColor',
-    'basicColor',
-    'basicColor',
-    'wireFrame',
-    // (() => { const m = new THREE.MeshNormalMaterial(); m.flatShading = false; return m; })(), // Normal.flatShading
-    'metal',
-];
-
 function getShapeForGeometry(geometry, scale) {
     if (geometry instanceof THREE.BoxGeometry) {
         const sizeX = geometry.parameters.width / 2 * scale;
@@ -206,11 +261,6 @@ function setRanRotation(mesh, body) {
     body.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 }
 
-const meshes = [];
-const zPos = -2.4
-let mesh;
-let scaleTo = -0.15;
-
 function getRandomPosition(radius) {
     let position, distanceSquared;
     do {
@@ -224,7 +274,15 @@ function getRandomPosition(radius) {
     return position;
 }
 
-let segments;
+function genRadius() {
+    if ( bezierCnt + extraCnt > 5 ) {
+        radius = window.innerWidth <= 900 ? 0.3 : 0.5;
+    } else if ( bezierCnt + extraCnt > 30 ) {
+        radius = window.innerWidth <= 900 ? 9.0 : 10.0;
+    } else {
+        radius = window.innerWidth <= 900 ? 0.1 : 0.2;
+    }
+}
 
 function addMesh() {
     genRadius();
@@ -258,9 +316,7 @@ function addMesh() {
 
     const geometryIndex = Math.floor(Math.random() * geometries.length);
 
-    let geometry = geometries[geometryIndex];
-    let material;
-    let ranScale;
+    geometry = geometries[geometryIndex];
 
     if (materials[materialIndex] === 'wireFrame') {
         const edges = new THREE.EdgesGeometry(geometry);
@@ -276,7 +332,6 @@ function addMesh() {
 
         lineMaterial.resolution.set(window.innerWidth, window.innerHeight);
     } else {
-    
         if (materials[materialIndex] === '2dColor') {
             material = new THREE.MeshBasicMaterial({ color: ranNeon() });
         } else if (materials[materialIndex] === 'basicColor') {
@@ -297,7 +352,6 @@ function addMesh() {
         }
     
     mesh = new THREE.Mesh(geometry, material);
-
     }
 
     mesh.position.set(position.x, position.y, position.z + zPos);
@@ -322,11 +376,6 @@ function addMesh() {
     meshes.push(mesh);
 }
 
-const plusCnt = document.getElementById('plusCnt');
-const minusCnt = document.getElementById('minusCnt');
-const num = document.getElementById('num');
-extraCnt = Number(num.innerHTML);
-
 function removeMesh() {
     if (meshes.length > 0) {
         const meshToRemove = meshes.pop();
@@ -337,28 +386,28 @@ function removeMesh() {
     }
 }
 
-plusCnt.addEventListener('click', function() {
-    extraCnt += 1;
-    num.innerHTML = bezierCnt + extraCnt;
-    addMesh();
-});
+function changeImgListUI() {
+    deleteImgList = document.querySelectorAll('.deleteImgList');
+    deleteImg = document.querySelectorAll('.deleteImg');
 
-minusCnt.addEventListener('click', function() {
-    if (bezierCnt + extraCnt > 0) {
-        extraCnt -= 1;
-        num.innerHTML = bezierCnt + extraCnt;
-        removeMesh();
+    if ( bg.classList.contains("day-mode") ) {
+        deleteImgList.forEach(el => {
+            el.style.backgroundColor = '#ffffff';
+            el.style.color = 'black';
+        });
+        deleteImg.forEach(el => {
+            el.style.background = 'url(./sources/icon/ICON_plusDay.svg)';
+        });
+    } else {
+        deleteImgList.forEach(el => {
+            el.style.backgroundColor = '#111111';
+            el.style.color = 'white';
+        });
+        deleteImg.forEach(el => {
+            el.style.background = 'url(./sources/icon/ICON_plusNight.svg)';
+        });
     }
-});
-
-const chooseFile = document.getElementById('chooseFile');
-const fileList = document.getElementById('fileList');
-chooseFile.addEventListener('input', loadFile);
-
-const imgMeshes = [];
-let deleteImgList = [];
-let deleteImg = [];
-let isNight = true;
+}
 
 function loadFile(event) {
     const input = event.target;
@@ -388,29 +437,10 @@ function loadFile(event) {
         
         fileList.appendChild(deleteImgListDiv);
 
-        deleteImgList = document.querySelectorAll('.deleteImgList');
-        deleteImg = document.querySelectorAll('.deleteImg');
-
-        if ( isNight === true ) {
-            deleteImgList.forEach(el => {
-                el.style.backgroundColor = '#ffffff';
-                el.style.color = 'black';
-            });
-            deleteImg.forEach(el => {
-                el.style.background = 'url(./sources/ICON_plusDay.svg)';
-            });
-        } else {
-            deleteImgList.forEach(el => {
-                el.style.backgroundColor = '#111111';
-                el.style.color = 'white';
-            });
-            deleteImg.forEach(el => {
-                el.style.background = 'url(./sources/ICON_plusNight.svg)';
-            });
-        }
+        changeImgListUI();
 
         deleteImgListDiv.addEventListener('click', function() {
-            removeMeshById(uniqueId);
+            removeImgMesh(uniqueId);
         });
 
         const reader = new FileReader();
@@ -460,26 +490,22 @@ function loadFile(event) {
     chooseFile.value = '';
 }
 
-function removeMeshById(id) {
-    // imgMeshes 배열에서 해당 ID를 가진 객체 찾기
+function removeImgMesh(id) {
     const meshInfoIndex = imgMeshes.findIndex(meshInfo => meshInfo.id === id);
     if (meshInfoIndex !== -1) {
         const meshInfo = imgMeshes[meshInfoIndex];
-        scene.remove(meshInfo.mesh); // Scene에서 mesh 제거
+        scene.remove(meshInfo.mesh);
         if (meshInfo.mesh.body) {
-            world.removeBody(meshInfo.mesh.body); // Cannon.js world에서 body 제거 (필요한 경우)
+            world.removeBody(meshInfo.mesh.body); 
         }
         imgMeshes.splice(meshInfoIndex, 1); // imgMeshes 배열에서 해당 객체 삭제
 
-        // HTML에서 파일 이름 div 제거
         const fileNameDiv = document.getElementById(id);
         if (fileNameDiv) {
             fileList.removeChild(fileNameDiv);
         }
     }
 }
-
-const textInput = document.getElementById('textInput');
 
 function updateScene() {
     // 현재 Scene 내의 모든 Mesh 삭제
@@ -505,17 +531,7 @@ function updateScene() {
         addMesh();
     }
     num.innerHTML = bezierCnt + extraCnt;
-    // console.log(bezierCnt, extraCnt, meshes.length)
 }
-
-const Ding01 = new Audio('./sources/sound/Ding01.mp3');
-const Ding02 = new Audio('./sources/sound/Ding02.mp3');
-const Ding03 = new Audio('./sources/sound/Ding03.mp3');
-const Ding04 = new Audio('./sources/sound/Ding04.mp3');
-
-let audios = [Ding01, Ding02, Ding03, Ding04];
-let audio;
-let currentAudio;
 
 function soundPlay() {
     if (currentAudio) {
@@ -528,9 +544,6 @@ function soundPlay() {
     currentAudio = audio;
 }
 
-const growDuration = 0.24;
-const shrinkDuration = 0.74;
-
 function cubicBezier(t, p0, p1, p2, p3) {
     const C = (3 * p1) - (3 * p0) + p3 - p0;
     const B = (3 * p0) - (6 * p1) + (3 * p2);
@@ -538,19 +551,6 @@ function cubicBezier(t, p0, p1, p2, p3) {
     const D = p0;
     return ((A * t + B) * t + C) * t + D;
 }
-
-const random = document.getElementById('random');
-let isranChecked = true;
-
-random.addEventListener('click', function() {
-    if (isranChecked === true) {
-        random.style.opacity = 0.3;
-        isranChecked = false;
-    } else {
-        random.style.opacity = 1.0;
-        isranChecked = true;
-    }
-});
 
 function animateMeshes() {
     const currentTime = (new Date()).getTime() / 500;
@@ -565,7 +565,6 @@ function animateMeshes() {
         }, 1000);
 
     }
-
 
     meshes.forEach(mesh => {
         if (!mesh.animation) {
@@ -626,15 +625,13 @@ function applyRadialForces() {
         radialVector.z -= 0; // 중심점(0, 0, 0)에서 벡터를 뺌
         
         radialVector.normalize(); // 방향 유지
-        const forceMagnitude = -0.1 * body.mass; // 힘 크기 설정
+        const forceMagnitude = -1 * gravityPar * body.mass; // 힘 크기 설정
         radialVector.x *= forceMagnitude;
         radialVector.y *= forceMagnitude;
         radialVector.z *= forceMagnitude;
         body.applyForce(radialVector, body.position);
     });
 }
-
-let boundaryWalls = [];
 
 function createOrUpdateWall(index, wallPosition, wallSize) {
     let shape = new CANNON.Box(new CANNON.Vec3(wallSize.x / 2, wallSize.y / 2, wallSize.z / 2));
@@ -672,269 +669,9 @@ function createBoundary(width, height, depth) {
     createOrUpdateWall(5, new CANNON.Vec3(0, 0, -halfDepth + zPos), new CANNON.Vec3(width * viewSize.width, height * viewSize.height, wallThickness));
 }
 
-// 카메라의 z 위치에서 볼 수 있는 뷰의 크기 계산
 function getViewSize(depth) {
     const fovInRadians = (camera.fov * Math.PI) / 180;
     const height = 2 * Math.tan(fovInRadians / 2) * Math.abs(depth);
     const width = height * camera.aspect;
     return { width, height };
-}
-createBoundary(1, 1, 5);
-
-let lastBezierCnt = -1;
-const camZpos = document.getElementById('camZpos');
-
-camZpos.addEventListener('input', function() {
-    camera.position.z = camZpos.value;
-    createBoundary(1, 1, 5);
-});
-
-function animate() {
-    requestAnimationFrame(animate);
-   
-    applyRadialForces();
-    if (bezierCnt !== lastBezierCnt) {
-        updateScene();
-        lastBezierCnt = bezierCnt;
-    }
-
-    // 물리 업데이트
-    world.step(1 / 60);
-
-    // Mesh를 물리 바디 상태로 업데이트
-    meshes.forEach(mesh => {
-        mesh.position.copy(mesh.body.position);
-        mesh.quaternion.copy(mesh.body.quaternion);
-    });
-    imgMeshes.forEach(function(imgMesh) {
-        imgMesh.mesh.position.copy(imgMesh.mesh.body.position);
-    });
-    animateMeshes();
-
-    // cannonDebugger.update(); 
-    composer.render();
-}
-animate();
-
-//UI BUTTON------------------------------------------------------------
-
-function underHeight750() {
-    const headline = document.querySelectorAll('.headline');
-    const content = document.querySelectorAll('.content');
-    const hyperlink = document.querySelectorAll('.hyperlink');
-    const aboutContent = document.querySelectorAll('.aboutContent');
-    const iconText = document.getElementById('iconText');
-
-    if (window.innerHeight < 750) {
-        headline.forEach(el => {
-            el.style.fontSize = '30px';
-        });
-        content.forEach(el => {
-            el.style.fontSize = '17px';
-        });
-        hyperlink.forEach(el => {
-            el.style.fontSize = '14px';
-        });
-        aboutContent.forEach(el => {
-            el.style.margin = '20px 0px 10px 0px';
-        });
-        iconText.style.fontSize = '14px';
-        iconText.style.margin = '10px 0px 20px 0px';
-    } else if ( window.innerHeight >= 750 && window.innerWidth <= 900 ) {
-        headline.forEach(el => {
-            el.style.fontSize = '36px';
-        });
-        content.forEach(el => {
-            el.style.fontSize = '20px';
-        });
-        hyperlink.forEach(el => {
-            el.style.fontSize = '15px';
-        });
-        aboutContent.forEach(el => {
-            el.style.margin = '60px 0px 20px 0px';
-        });
-        iconText.style.fontSize = '16px';
-        iconText.style.margin = '20px 0px 40px 0px';
-    } else if ( window.innerHeight >= 750 && window.innerWidth > 900 ) {
-        headline.forEach(el => {
-            el.style.fontSize = '72px';
-        });
-        content.forEach(el => {
-            el.style.fontSize = '28px';
-        });
-        hyperlink.forEach(el => {
-            el.style.fontSize = '18px';
-        });
-        aboutContent.forEach(el => {
-            el.style.margin = '60px 0px 20px 0px';
-        });
-        iconText.style.fontSize = '16px';
-        iconText.style.margin = '20px 0px 40px 0px';
-    }
-}
-
-document.addEventListener("DOMContentLoaded", underHeight750);
-window.addEventListener('resize', underHeight750);
-
-const dayNight = document.getElementById('dayNight');
-
-const boundBox = document.getElementById('boundBox');
-const bg = document.getElementById('bg');
-const controlPanel = document.getElementById('controlPanel');
-const threeOpacity = document.getElementById('threeOpacity');
-const textOpacity = document.getElementById('textOpacity');
-const bezierCanvas = document.getElementById('bezierCanvas');
-
-const cube = document.getElementById('cube');
-const saveImg = document.getElementById('saveImg');
-const settings = document.getElementById('settings');
-const rangeInput = document.querySelectorAll('.rangeInput');
-const setCircle = document.getElementById('setCircle');
-const imgBtn = document.querySelectorAll('.imgBtn');
-const aboutIcon = document.getElementById('aboutIcon');
-
-dayNight.addEventListener('click', function() {
-    if ( isNight === true ) {
-        bg.classList.add('night-mode');
-        bg.classList.remove('day-mode');
-        boundBox.classList.remove('blackText');
-        boundBox.classList.add('whiteText');
-        exScroll.style.mixBlendMode = 'screen';
-        textInput.style.backgroundColor = 'white';
-        textInput.style.color = '#111111';
-
-        controlPanel.style.color = 'white';
-        controlPanel.style.border = '2px #ffffff solid';
-        controlPanel.style.fontWeight = '450';
-        controlPanel.style.backgroundColor ='rgba(0, 0, 0, 0.66)';
-        setCircle.style.border = controlPanel.style.border;
-        setCircle.style.backgroundColor = controlPanel.style.backgroundColor;
-        imgBtn.forEach(el => {
-            el.style.backgroundColor = '#ffffff';
-            el.style.color = 'black';
-        });
-        deleteImgList.forEach(el => {
-            el.style.backgroundColor = '#111111';
-            el.style.color = 'white';
-        });
-        deleteImg.forEach(el => {
-            el.style.background = 'url(./sources/ICON_plusNight.svg)';
-        });
-        dayNight.src = 'sources/ICON_dayMode.svg';
-        random.src = 'sources/ICON_ranNight.svg';
-        minusCnt.src = 'sources/ICON_minusNight.svg';
-        cube.src = 'sources/ICON_cntNight.svg';
-        plusCnt.src = 'sources/ICON_plusNight.svg';
-        saveImg.src = 'sources/ICON_imgNight.svg';
-        settings.src = 'sources/ICON_settingNight.svg';
-        rangeInput.forEach(el => el.style.accentColor = 'white');
-        num.style.color = 'white';
-        num.style.fontWeight = '700';
-        aboutIcon.src = 'sources/ICON_aboutNight.svg';
-
-        isNight = false;
-    } else {
-        bg.classList.add('day-mode');
-        bg.classList.remove('night-mode');
-        boundBox.classList.remove('whiteText');
-        boundBox.classList.add('blackText');
-        exScroll.style.mixBlendMode = 'multiply';
-        textInput.style.backgroundColor = '#111111';
-        textInput.style.color = 'white';
-
-        controlPanel.style.color = 'black';
-        controlPanel.style.border = '2px #111111 solid';
-        controlPanel.style.fontWeight = '700';
-        controlPanel.style.backgroundColor ='rgba(255, 255, 255, 0.66)';
-        setCircle.style.border = controlPanel.style.border;
-        setCircle.style.backgroundColor = controlPanel.style.backgroundColor;
-        imgBtn.forEach(el => {
-            el.style.backgroundColor = '#111111';
-            el.style.color = 'white';
-        });
-        deleteImgList.forEach(el => {
-            el.style.backgroundColor = '#ffffff';
-            el.style.color = 'black';
-        });
-        deleteImg.forEach(el => {
-            el.style.background = 'url(./sources/ICON_plusDay.svg)';
-        });
-
-        dayNight.src = 'sources/ICON_nightMode.svg';
-        random.src = 'sources/ICON_ranDay.svg';
-        minusCnt.src = 'sources/ICON_minusDay.svg';
-        cube.src = 'sources/ICON_cntDay.svg';
-        plusCnt.src = 'sources/ICON_plusDay.svg';
-        saveImg.src = 'sources/ICON_imgDay.svg';
-        settings.src = 'sources/ICON_settingDay.svg';
-        rangeInput.forEach(el => el.style.accentColor = '#111111');
-        num.style.color = '#111111';
-        num.style.fontWeight = '800';
-        aboutIcon.src = 'sources/ICON_aboutDay.svg';
-
-        isNight = true;
-    }
-});
-
-let isSettingsOff = true;
-settings.addEventListener('click', function() {
-    if ( isSettingsOff === true ) {
-        controlPanel.style.display = 'flex';
-        setCircle.style.display = 'block';
-        isSettingsOff = false;
-    } else {
-        controlPanel.style.display = 'none';
-        setCircle.style.display ='none';
-        isSettingsOff = true;
-    }
-});
-
-threeOpacity.addEventListener('input', function() {
-    let opacityValue = threeOpacity.value / 10;
-    threeCanvas.style.opacity = opacityValue;
-
-    const threeOpacityText = document.getElementById('threeOpacityText')
-    threeOpacityText.innerHTML = (opacityValue * 100) + '%';
-    
-    if (opacityValue == 0) {
-        threeCanvas.style.display = 'none';
-    } else {
-        threeCanvas.style.display = 'block';
-    }
-});
-
-textOpacity.addEventListener('input', function() {
-    let opacityValue = textOpacity.value / 10;
-    bezierCanvas.style.opacity = opacityValue;
-    boundBox.style.opacity = opacityValue;
-    textInput.style.opacity = opacityValue;
-
-    const textOpacityText = document.getElementById('textOpacityText')
-    textOpacityText.innerHTML = (opacityValue * 100) + '%';
-
-});
-
-const aboutDiv = document.getElementById('aboutDiv');
-const allWithoutAbout = document.getElementById('allWithoutAbout');
-
-let isAboutNone = true;
-
-aboutIcon.addEventListener('click', function() {
-    if ( isAboutNone === true ) {
-        aboutIcon.src = 'sources/ICON_closeNight.svg';
-        aboutDiv.style.display = 'flex';
-        allWithoutAbout.style.filter = 'blur(3px)';
-        isAboutNone = false;
-    } else {
-        if ( isNight === true ) {
-            aboutIcon.src = 'sources/ICON_aboutDay.svg';
-        } else {
-            aboutIcon.src = 'sources/ICON_aboutNight.svg';
-        }
-        aboutDiv.style.display = 'none';
-        allWithoutAbout.style.filter = 'blur(0px)';
-        isAboutNone = true;
-    }
-});
-
-
+};
