@@ -241,13 +241,13 @@ function initTextSize() {
             textSize.value = 100;
         }
     } else {
-        textSize.max = 72;
+        textSize.max = 56;
         textSize.min = 18;
-        if (textSize.value > 72 || textSize.value < 18) {
+        if (textSize.value > 56 || textSize.value < 18) {
             textSize.value = 36;
         }
     }
-    changeTextSize();
+    changeTextSize(); //538px 57pt
 }
 
 function aboutUI() {

@@ -1,6 +1,5 @@
 import { Bezier } from "./bezier.js";
 
-//텍스트 div 생성 --------------------------------------------------------
 const textInput = document.getElementById('textInput');
 const fakeTextInput = document.getElementById('fakeTextInput');
 const container = document.getElementById('container');
@@ -9,8 +8,8 @@ const tempoRange = document.getElementById('tempo');
 const exScroll = document.getElementById('exScroll');
 
 const ctx = canvas.getContext('2d');
-const widthPixelRatio = window.innerWidth * window.devicePixelRatio;
-const heightPixelRatio = window.innerHeight * window.devicePixelRatio;
+const widthPixelRatio = window.innerWidth
+const heightPixelRatio = window.innerHeight
 const endXFactor = -20;
 const textAlignMap = {};
 const DRAG_THRESHOLD = 0.1;
@@ -42,14 +41,14 @@ function init() {
         tempoText.innerHTML = parseFloat(tempoValue).toFixed(1) + 'sec';
         updateSpeedForAllCurves();
     });
-    
+
+    // 초기 div 생성 및 화면 표시
     setTimeout(typeText, 500);
-    onTextInput(); // 초기 div 생성 및 화면 표시
+    onTextInput(); 
     
     textInput.addEventListener('keyup', function() {
         fakeTextInput.value = "";
     });
-    
     textInput.addEventListener('keyup', onTextInput);
     
     document.body.addEventListener('wheel', handleScroll);
@@ -196,8 +195,6 @@ function typeText() {
         intervalType: 90,
     });
 }
-
-
 
 function ranTextAlign() {
     document.querySelectorAll('.textDiv').forEach((div, index) => {
@@ -685,7 +682,6 @@ function addEventListeners() {
     canvas.addEventListener('mousedown', startDrag);
     canvas.addEventListener('mousemove', drag);
     canvas.addEventListener('mouseup', endDrag);
-
     canvas.addEventListener('touchstart', startDrag);
     canvas.addEventListener('touchmove', drag);
     canvas.addEventListener('touchend', endDrag);

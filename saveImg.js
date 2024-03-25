@@ -9,7 +9,7 @@ document.getElementById('saveImg').addEventListener('click', function() {
         canvas.width = window.innerWidth * window.devicePixelRatio;
         canvas.height = window.innerHeight * window.devicePixelRatio;
 
-        function drawGradient(ctx, elementId, width, height) {
+        function drawBg(ctx, elementId, width, height) {
             let element = document.getElementById(elementId);
     
             if (element.classList.contains("day-mode")) {
@@ -23,7 +23,7 @@ document.getElementById('saveImg').addEventListener('click', function() {
         let img = new Image();
         img.src = domImage;
 
-        drawGradient(ctx, "bg", canvas.width, canvas.height);
+        drawBg(ctx, "bg", canvas.width, canvas.height);
 
         img.onload = function() {
                 ctx.drawImage(img, 0, 0);
@@ -39,3 +39,4 @@ document.getElementById('saveImg').addEventListener('click', function() {
         document.body.removeChild(link); // Firefox
     }
 });
+console.log(window.devicePixelRatio)
