@@ -33,7 +33,9 @@ document.addEventListener("DOMContentLoaded", function() {
         underHeight750();
         initTextSize();
     });
-    document.addEventListener('focusout', function(e) { window.scrollTo(0, 0) });
+    document.addEventListener('focusout', function(e) {
+        window.scrollTo(0, 0) 
+    });
     random.addEventListener('click', randomToggle);
     settings.addEventListener('click', openSettings);
     threeOpacity.addEventListener('input', changeThreeOP);
@@ -41,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
     aboutIcon.addEventListener('click', aboutUI);
 
     //폰트 사이즈
+    textSize.value = window.innerWidth <= 900 ? 36 : 100;
     textSize.addEventListener('input', changeTextSize);
     initTextSize();
 });
@@ -232,9 +235,9 @@ function changeTextSize() {
 
 function initTextSize() {
     if (window.innerWidth > 900) {
-        textSize.max = 125;
+        textSize.max = 150;
         textSize.min = 25;
-        if (textSize.value > 125 || textSize.value < 25) {
+        if (textSize.value > 150 || textSize.value < 25) {
             textSize.value = 100;
         }
     } else {
@@ -244,8 +247,6 @@ function initTextSize() {
             textSize.value = 36;
         }
     }
-
-    textSize.value = window.innerWidth <= 900 ? 36 : 100;
     changeTextSize();
 }
 
