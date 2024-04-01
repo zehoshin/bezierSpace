@@ -34,7 +34,10 @@ document.addEventListener("DOMContentLoaded", function() {
         initTextSize();
     });
     document.addEventListener('focusout', function(e) {
-        window.scrollTo(0, 0) 
+        window.scrollTo(0, 0);
+    });
+    document.getElementById('iframe').addEventListener('focusout', function(e) {
+        window.scrollTo(0, 0);
     });
     random.addEventListener('click', randomToggle);
     settings.addEventListener('click', openSettings);
