@@ -33,9 +33,9 @@ document.addEventListener("DOMContentLoaded", function() {
         underHeight750();
         initTextSize();
     });
-    // document.addEventListener('focusout', function(e) {
-    //     window.scrollTo(0, 0) 
-    // });
+    document.addEventListener('focusout', function(e) {
+        window.scrollTo(0, 0) 
+    });
     random.addEventListener('click', randomToggle);
     settings.addEventListener('click', openSettings);
     threeOpacity.addEventListener('input', changeThreeOP);
