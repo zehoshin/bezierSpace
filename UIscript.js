@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function underHeight750() {
     if (window.innerHeight < 750) {
         headline.forEach(el => {
-            el.style.fontSize = '30px';
+            el.style.fontSize = '26px';
         });
         content.forEach(el => {
             el.style.fontSize = '17px';
@@ -86,7 +86,8 @@ function underHeight750() {
             el.style.fontSize = '72px';
         });
         content.forEach(el => {
-            el.style.fontSize = '28px';
+            el.style.fontSize = '24px';
+            el.style.lineHeight = '1.56';
         });
         hyperlink.forEach(el => {
             el.style.fontSize = '18px';

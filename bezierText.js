@@ -8,8 +8,8 @@ const tempoRange = document.getElementById('tempo');
 const exScroll = document.getElementById('exScroll');
 
 const ctx = canvas.getContext('2d');
-const widthPixelRatio = window.innerWidth
-const heightPixelRatio = window.innerHeight
+const widthPixelRatio = window.innerWidth * window.devicePixelRatio;
+const heightPixelRatio = window.innerHeight * window.devicePixelRatio;
 const endXFactor = -20;
 const textAlignMap = {};
 const DRAG_THRESHOLD = 0.1;
@@ -73,7 +73,7 @@ function init() {
     updScrollShape();
     animate();
     addEventListeners();
-};
+}
 
 function updateSpeedForAllCurves() {
     const newSpeed = setSpeed();
@@ -171,7 +171,7 @@ function onTextInput() {
     textJustify();
     genBezierCurve(); 
     bezierCnt = allControlPoints.length;
-};
+}
 
 function createCircle(parentDiv, circleNum) {
     let circleDiv = document.createElement('div');

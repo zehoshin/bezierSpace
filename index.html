@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<script type="importmap">
+    {
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/+esm",
+        "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/+esm",
+        "cannon-es-debugger" : "https://cdn.jsdelivr.net/npm/cannon-es-debugger@1.0.0/+esm"
+    }
+    }
+</script>
+
 <div id="allWithoutAbout" style="height:100dvh">
 <div id="bg" class="day-mode"></div>
 <div id="captureArea">
@@ -96,7 +106,7 @@
 <div id="aboutDiv" class="aboutDiv" style="height:100dvh">
     <div class="aboutContent">
         <div class="headline">Bezier Space</div>
-        <div class="content">소개를 위한 더미 텍스트입니다. 모든 국민은 법률이 정하는 바에 의하여 국가기관에 문서로 청원할 권리를 가진다. 선거와 국민투표의 공정한 관리 및 정당에 관한 사무를 처리하기 위하여 선거관리위원회를 둔다. 국채를 모집하거나 예산외에 국가의 부담이 될 계약을 체결하려 할 때에는 정부는 미리 국회의 의결을 얻어야 한다.</div>
+        <div class="content">모션그래픽을 다루는 코스믹레이가 자신을 소개하기 위한 공간을 만든다면 어떤 모습이 될까요? Bezier Space는 이를 모색하기위한 기념비적인 첫 실험입니다. 공간에서 텍스트를 입력하면 베지어 곡선과 오브젝트가 무작위로 생성됩니다. 타임라인 속에만 있던 그들을 Bezier Space에서 우연히 마주해보세요. 그리고 새롭게 역할을 부여한 코스믹레이의 언어를 경험해보세요.</div>
         <div class="hyperlink">
             <div class="credit">COSMIC |
                 <a href="https://www.cosmic-ray.tv" target="_blank"> cosmic-ray.tv</a>
@@ -140,6 +150,7 @@
     
 </div>
 <img src="./sources/icon/ICON_aboutDay.svg" id="aboutIcon" class="about">
+
 <script src="UIscript.js"></script>
 <script src="https://unpkg.com/type-hangul"></script>
 <script type="module" src="bezierText.js"></script>

@@ -1,24 +1,27 @@
-import * as THREE from './three.module.js';
-import * as CANNON from './cannon-es.js';
+import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 import { Line2 } from "./lines/Line2.js";
 import { LineMaterial } from "./lines/LineMaterial.js";
 import { LineSegmentsGeometry } from "./lines/LineSegmentsGeometry.js";
 import { bezierCnt, pointPos, ranNeon, ranTextAlign } from './bezierText.js';
-import CannonDebugger from './cannon-es-debugger.js';
+import CannonDebugger from 'cannon-es-debugger';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const light = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
-const renderer = new THREE.WebGLRenderer( { 
+const renderer = new THREE.WebGLRenderer({ 
     antialias: true,
     alpha: true, 
     preserveDrawingBuffer: true,
-    powerPreference: "high-performance"  } ); 
+    powerPreference: "high-performance"  
+}); 
 const threeCanvas = document.getElementById('threeCanvas');
 const world = new CANNON.World();
 const cannonDebugger = new CannonDebugger( scene, world );
 
-let extraCnt, radius, gravityResetTimer, mesh, segments, audio, currentAudio, geometry, material, ranScale, gravityPar; 
+let extraCnt, radius, gravityResetTimer, 
+    mesh, segments, audio, currentAudio, geometry, 
+    material, ranScale, gravityPar; 
 
 const exScroll = document.getElementById('exScroll');
 const plusCnt = document.getElementById('plusCnt');
@@ -135,8 +138,7 @@ function init() {
         gravityPar = gravityForce.value / 10;
         document.getElementById('grabityText').innerHTML = gravityForce.value * 5 + '%';
     });
-    
-};
+}
 
 function animate() {
     requestAnimationFrame(animate);
@@ -162,7 +164,7 @@ function animate() {
 
     // cannonDebugger.update(); 
     renderer.render( scene, camera );
-};
+}
 
 function onWindowResize() {
     const width = window.innerWidth;
@@ -174,7 +176,7 @@ function onWindowResize() {
     createBoundary(1, 1, 5);
 
     renderer.setSize( width, height );
-};
+}
 
 function onWindowScroll() {
     clearTimeout(gravityResetTimer);
@@ -186,7 +188,7 @@ function onWindowScroll() {
     gravityResetTimer = setTimeout(() => {
         world.gravity.set(0, 0, 0);
     }, 1000);
-};
+}
 
 function startScroll(e) {
     isDragging = true;
@@ -275,13 +277,8 @@ function getRandomPosition(radius) {
 }
 
 function genRadius() {
-    if ( bezierCnt + extraCnt > 5 ) {
-        radius = window.innerWidth <= 900 ? 0.3 : 0.5;
-    } else if ( bezierCnt + extraCnt > 30 ) {
-        radius = window.innerWidth <= 900 ? 9.0 : 10.0;
-    } else {
-        radius = window.innerWidth <= 900 ? 0.1 : 0.2;
-    }
+    radius = (bezierCnt + extraCnt) / 40;
+    radius.toFixed(3);
 }
 
 function addMesh() {
@@ -333,10 +330,14 @@ function addMesh() {
         lineMaterial.resolution.set(window.innerWidth, window.innerHeight);
     } else {
         if (materials[materialIndex] === '2dColor') {
-            material = new THREE.MeshBasicMaterial({ color: ranNeon() });
+            material = new THREE.MeshBasicMaterial({ 
+                color: ranNeon() 
+            });
         } else if (materials[materialIndex] === 'basicColor') {
             material = new THREE.MeshStandardMaterial({ 
-                color: ranNeon(), emissive: ranNeon() });
+                color: ranNeon(), 
+                emissive: ranNeon() 
+            });
         } else if (materials[materialIndex] === 'metal') {
             material = new THREE.MeshStandardMaterial({ 
                 color: ranNeon(),
@@ -363,7 +364,10 @@ function addMesh() {
     
     const body = new CANNON.Body({
         mass: 1, 
-        material: new CANNON.Material({friction: 0.1, restitution: 0.9})
+        material: new CANNON.Material({
+            friction: 0.1, 
+            restitution: 0.9
+        })
     });
     body.addShape(shape);
     body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
@@ -434,7 +438,6 @@ function loadFile(event) {
 
         deleteImgListDiv.appendChild(fileNameDiv);
         deleteImgListDiv.appendChild(deleteImgDiv);
-        
         fileList.appendChild(deleteImgListDiv);
 
         changeImgListUI();
@@ -458,7 +461,8 @@ function loadFile(event) {
                     color: new THREE.Color('#ffffff'),
                     map: texture,
                     reflectivity: 0,
-                    lightMapIntensity : 0  });
+                    lightMapIntensity : 0  
+                });
                     
                 texture.colorSpace = THREE.SRGBColorSpace;
                 texture.needsUpdate = true;
@@ -498,8 +502,7 @@ function removeImgMesh(id) {
         if (meshInfo.mesh.body) {
             world.removeBody(meshInfo.mesh.body); 
         }
-        imgMeshes.splice(meshInfoIndex, 1); // imgMeshes 배열에서 해당 객체 삭제
-
+        imgMeshes.splice(meshInfoIndex, 1); 
         const fileNameDiv = document.getElementById(id);
         if (fileNameDiv) {
             fileList.removeChild(fileNameDiv);
@@ -525,7 +528,6 @@ function updateScene() {
             }
         }
     });
-
 
     for (let i = 0; i < bezierCnt + extraCnt; i++) {
         addMesh();
@@ -563,7 +565,6 @@ function animateMeshes() {
         setTimeout(() => {
             random.classList.remove('rotate');
         }, 1000);
-
     }
 
     meshes.forEach(mesh => {
@@ -622,7 +623,7 @@ function applyRadialForces() {
         const radialVector = new CANNON.Vec3(body.position.x, body.position.y, body.position.z);
         radialVector.x -= 0;
         radialVector.y -= 0;
-        radialVector.z -= 0; // 중심점(0, 0, 0)에서 벡터를 뺌
+        radialVector.z -= 0;
         
         radialVector.normalize(); // 방향 유지
         const forceMagnitude = -1 * gravityPar * body.mass; // 힘 크기 설정
@@ -653,7 +654,6 @@ function createOrUpdateWall(index, wallPosition, wallSize) {
 }
 
 function createBoundary(width, height, depth) {
-
     const viewSize = getViewSize(camera.position.z);
     const wallThickness = 0.01;
     const halfWidth = width * viewSize.width / 2;
@@ -674,4 +674,4 @@ function getViewSize(depth) {
     const height = 2 * Math.tan(fovInRadians / 2) * Math.abs(depth);
     const width = height * camera.aspect;
     return { width, height };
-};
+}

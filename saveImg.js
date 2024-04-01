@@ -39,4 +39,3 @@ document.getElementById('saveImg').addEventListener('click', function() {
         document.body.removeChild(link); // Firefox
     }
 });
-console.log(window.devicePixelRatio)

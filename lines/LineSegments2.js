@@ -9,7 +9,7 @@ import {
 	Sphere,
 	Vector3,
 	Vector4
-} from '../three.module.js';
+} from 'three';
 import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 import { LineMaterial } from './LineMaterial.js';
 
