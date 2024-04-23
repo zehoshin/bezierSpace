@@ -18,7 +18,7 @@ const ELASTICITY = 0.2;
 const ANIMATION_DURATION = 10;
 
 let bezierCnt, pointPos;
-let allControlPoints = [];
+let bezierCurveData = [];
 let seconds = 3;
 let isDragging = false;
 let scrollUpd = false;
@@ -58,26 +58,31 @@ function init() {
     
     window.addEventListener('resize', function() {
         textJustify();
-        updScrollShape();
-        updScrollPos();
-        updBezierCurvePos();
+        updateScrollShape();
+        updateScrollPos();
+        updateBezierCurvePos();
     });
     
     // 내용 변경 감지 및 스크롤바 업데이트
     const observer = new MutationObserver(function() {
-        updScrollShape();
-        updScrollPos();
+        updateScrollShape();
+        updateScrollPos();
     });
-    observer.observe(container, { childList: true, subtree: true, attributes: true, characterData: true });
+    observer.observe(container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true 
+    });
     
-    updScrollShape();
+    updateScrollShape();
     animate();
     addEventListeners();
 }
 
 function updateSpeedForAllCurves() {
     const newSpeed = setSpeed();
-    allControlPoints.forEach(curve => {
+    bezierCurveData.forEach(curve => {
         curve.speed = newSpeed;
     });
 }
@@ -170,7 +175,7 @@ function onTextInput() {
     });
     textJustify();
     genBezierCurve(); 
-    bezierCnt = allControlPoints.length;
+    bezierCnt = bezierCurveData.length;
 }
 
 function createCircle(parentDiv, circleNum) {
@@ -211,7 +216,7 @@ function ranTextAlign() {
 container.addEventListener('scroll', function() {
     if (!scrollUpd) {
         requestAnimationFrame(function() {
-            updBezierCurvePos(); // 베지어 곡선 위치 업데이트 함수
+            updateBezierCurvePos(); // 베지어 곡선 위치 업데이트 함수
             scrollUpd = false;
         });
         scrollUpd = true;
@@ -230,19 +235,18 @@ function handleScroll(e) {
     } else if (container.scrollTop > maxScroll) {
         container.scrollTop = maxScroll;
     }
-
-    updScrollPos();
+    updateScrollPos();
 }
 
 // 스크롤바 모양과 위치 업데이트 함수들
-function updScrollShape() {
+function updateScrollShape() {
     const scrollRatio = container.clientHeight / container.scrollHeight;
     const scrollbarHeight = Math.max(scrollRatio * container.clientHeight - 20, 20);
     exScroll.style.height = `${scrollbarHeight}px`;
     exScroll.style.display = scrollRatio >= 1 ? 'none' : 'block';
 }
 
-function updScrollPos() {
+function updateScrollPos() {
     const scrollPer = container.scrollTop / (container.scrollHeight - container.clientHeight);
     const topPosition = scrollPer * (container.clientHeight - exScroll.offsetHeight);
     exScroll.style.top = `${topPosition}px`;
@@ -401,20 +405,17 @@ function drawControlPoints(curve) {
         if (index === 0 || index === 3) { // 시작점 또는 끝점
             size = curve.lineWidth * 1;
         }
-
         switch (curve.shape) {
             case 'circle':
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);
                 ctx.fill();
-                ctx.antialias = true
                 break;
             case 'square':
                 ctx.beginPath();
                 size *= 0.9;
                 ctx.rect(point.x - size, point.y - size, size * 2, size * 2);
                 ctx.fill();
-                ctx.antialias = true
                 break;
         }
     });
@@ -453,7 +454,6 @@ function drawBezierCurve(curve) {
     }
     ctx.strokeStyle = curve.color;
     ctx.lineWidth = curve.lineWidth;
-    ctx.antialias = true
     
     if (curve.lineStyle === 'dashed') {
         ctx.setLineDash([curve.lineWidth, curve.lineWidth]);
@@ -483,8 +483,8 @@ function genBezierCurve() {
 
     let hasTextCircleNum3 = document.querySelector('.textCircleNum3') !== null;
     if (circles.length === 0 || !hasTextCircleNum3) {
-        allControlPoints = [];
-        allControlPoints.length = 0;
+        bezierCurveData = [];
+        bezierCurveData.length = 0;
         redraw(); 
         return; 
     }
@@ -504,11 +504,15 @@ function genBezierCurve() {
             controlPoints[2] = ranPoint(((index + 1) + 1), controlPoints[3]);
 
             let relativePositions = {
-                cp1: { dx: controlPoints[1].x - controlPoints[0].x, dy: controlPoints[1].y - controlPoints[0].y },
-                cp2: { dx: controlPoints[2].x - controlPoints[3].x, dy: controlPoints[2].y - controlPoints[3].y }
+                cp1: {
+                    dx: controlPoints[1].x - controlPoints[0].x, dy: controlPoints[1].y - controlPoints[0].y 
+                },
+                cp2: {
+                    dx: controlPoints[2].x - controlPoints[3].x, dy: controlPoints[2].y - controlPoints[3].y 
+                }
             };
         
-            allControlPoints.push({
+            bezierCurveData.push({
                 startCircleNum: (index + 1) - 1, 
                 endCircleNum: (index + 1),
                 relativePositions: relativePositions,
@@ -520,7 +524,7 @@ function genBezierCurve() {
                 radius: ranRadius(),
                 currentPoint: 0, 
                 direction: 1,
-                speed: setSpeed()
+                speed: setSpeed(),
             });
 
             newControlPointsAdded = true;
@@ -533,42 +537,50 @@ function genBezierCurve() {
         parseInt(circle.className.match(/textCircleNum(\d+)/)[1], 10))) - 2) / 2);
 
     // 최신 곡선만 유지
-    if (allControlPoints.length > maxCurvesCount) {
-        allControlPoints = allControlPoints.slice(-maxCurvesCount);
+    if (bezierCurveData.length > maxCurvesCount) {
+        bezierCurveData = bezierCurveData.slice(-maxCurvesCount);
     }
-
     if (newControlPointsAdded) {
         redraw(); // 모든 곡선 다시 그리기
     }
-    // console.log(allControlPoints);
+    // console.log(bezierCurveData);
 }
 
-function updBezierCurvePos() {
-    allControlPoints.forEach(function(curve) {
+function updateBezierCurvePos() {
+    bezierCurveData.forEach(function(curve) {
         const startPos = getStartEndPos(curve.startCircleNum);
         const endPos = getStartEndPos(curve.endCircleNum);    
 
         if (startPos && endPos) {
             curve.points[0] = startPos;
             curve.points[3] = endPos;
-            curve.points[1] = { x: startPos.x + curve.relativePositions.cp1.dx, y: startPos.y + curve.relativePositions.cp1.dy };
-            curve.points[2] = { x: endPos.x + curve.relativePositions.cp2.dx, y: endPos.y + curve.relativePositions.cp2.dy };
+            curve.points[1] = {
+                x: startPos.x + curve.relativePositions.cp1.dx, 
+                y: startPos.y + curve.relativePositions.cp1.dy
+            };
+            curve.points[2] = {
+                x: endPos.x + curve.relativePositions.cp2.dx,
+                y: endPos.y + curve.relativePositions.cp2.dy
+            };
         }
     });
 }
 
-function updStartEndPos() {
+function updateStartEndPos() {
     const circleElements = document.querySelectorAll('[class*="textCircleNum"]');
     circleElements.forEach(circle => {
         const num = parseInt(circle.className.match(/textCircleNum(\d+)/)[1]);
         const pos = getStartEndPos(num);
 
         if (pos) {
-            allControlPoints.forEach(curve => {
+            bezierCurveData.forEach(curve => {
                 if (curve.startCircleNum === num) {
                     curve.points[0] = pos;
                 } else if (curve.endCircleNum === num) {
-                    curve.points[3] = { x: pos.x + endXFactor, y: pos.y };
+                    curve.points[3] = {
+                        x: pos.x + endXFactor,
+                        y: pos.y 
+                    };
                 }
             });
         }
@@ -580,7 +592,7 @@ function redraw() {
     canvas.height = heightPixelRatio;
     ctx.clearRect(0, 0, canvas.width, canvas.height); 
 
-    allControlPoints.forEach(function(curve) {
+    bezierCurveData.forEach(function(curve) {
         drawBezierCurve(curve);
         drawControlPoints(curve); 
         drawControlLines(curve);
@@ -598,11 +610,10 @@ function easeInOut(currentPoint) {
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    updStartEndPos();
+    updateStartEndPos();
     redraw();
 
-    allControlPoints.forEach(function(curve) {
-        
+    bezierCurveData.forEach(function(curve) {
         let bezier = new Bezier(curve.points);
         pointPos = curve.currentPoint;
         let point = bezier.get(pointPos);
@@ -658,7 +669,7 @@ function animate() {
 //마우스 드래그 이벤트---------------------------------------------
 // 드래그 시작 검사
 function checkDragStart(x, y) {
-    allControlPoints.forEach((curve, curveIndex) => {
+    bezierCurveData.forEach((curve, curveIndex) => {
         curve.points.forEach((point, pointIndex) => {
             if (Math.sqrt((point.x - x) ** 2 + (point.y - y) ** 2) < curve.radius) {
                 if (pointIndex === 0 || pointIndex === 3) return;
@@ -672,7 +683,7 @@ function checkDragStart(x, y) {
 // 드래그 중 제어점 위치 업데이트
 function updatePointPos(x, y) {
     const { curveIndex, pointIndex } = draggingPoint;
-    const controlPoint = allControlPoints[curveIndex].points[pointIndex];
+    const controlPoint = bezierCurveData[curveIndex].points[pointIndex];
     controlPoint.x = x;
     controlPoint.y = y;
     redraw();
@@ -728,7 +739,7 @@ function endDrag(e) {
 // Elastic 계산
 function calElastic() {
     const { curveIndex, pointIndex } = draggingPoint;
-    const curve = allControlPoints[curveIndex];
+    const curve = bezierCurveData[curveIndex];
     const controlPoint = curve.points[pointIndex];
     updateRelativePos(curve, pointIndex);
 
@@ -738,7 +749,13 @@ function calElastic() {
     const overshootX = controlPoint.x + directionX * OVERSHOOT_DISTANCE;
     const overshootY = controlPoint.y + directionY * OVERSHOOT_DISTANCE;
 
-    withElasticity(curveIndex, pointIndex, controlPoint.x, controlPoint.y, overshootX, overshootY);
+    withElasticity(curveIndex, 
+                   pointIndex, 
+                   controlPoint.x, 
+                   controlPoint.y, 
+                   overshootX, 
+                   overshootY
+                   );
 }
 
 // 상대적 위치
@@ -754,8 +771,14 @@ function updateRelativePos(curve, pointIndex) {
 }
 
 // Elastic 움직임
-function withElasticity(curveIndex, pointIndex, targetX, targetY, overshootX, overshootY) {
-    const controlPoint = allControlPoints[curveIndex].points[pointIndex];
+function withElasticity(curveIndex, 
+                        pointIndex, 
+                        targetX, 
+                        targetY, 
+                        overshootX, 
+                        overshootY
+                        ) {
+    const controlPoint = bezierCurveData[curveIndex].points[pointIndex];
     // 이전 애니메이션 프레임 취소
     if (controlPoint.animationFrameId !== null) {
         cancelAnimationFrame(controlPoint.animationFrameId);

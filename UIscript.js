@@ -33,12 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
         underHeight750();
         initTextSize();
     });
-    document.addEventListener('focusout', function(e) {
-        window.scrollTo(0, 0);
-    });
-    document.getElementById('iframe').addEventListener('focusout', function(e) {
-        window.scrollTo(0, 0);
-    });
+
     random.addEventListener('click', randomToggle);
     settings.addEventListener('click', openSettings);
     threeOpacity.addEventListener('input', changeThreeOP);
@@ -49,6 +44,13 @@ document.addEventListener("DOMContentLoaded", function() {
     textSize.value = window.innerWidth <= 900 ? 36 : 100;
     textSize.addEventListener('input', changeTextSize);
     initTextSize();
+
+    document.addEventListener('focusout', function() {
+        window.scrollTo(0, 0);
+    });
+    document.getElementById('iframe').addEventListener('focusout', function() {
+        window.scrollTo(0, 0);
+    });
 });
 
 function underHeight750() {
